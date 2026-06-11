@@ -1,13 +1,20 @@
 {%- comment -%}
-  sections/booking-form.liquid — Terminanfrage in 3 Schritten.
+  sections/booking-form.liquid — Terminbuchung in 3 Schritten.
 
-  Technik:
-  - Nutzt Shopifys Kontaktformular (form 'contact'): Anfragen landen
-    als E-Mail im Shop-Postfach — funktioniert ohne App und ohne JS.
-  - JS (main.js) verwandelt das Formular progressiv in einen 3-Schritte-Stepper.
-  - Cowlendar-Integration: Section akzeptiert App-Blöcke ("@app"). Den
-    Cowlendar-Block im Theme-Editor hinzufügen und ggf. das Formular über
-    die Einstellung „Anfrage-Formular anzeigen“ deaktivieren.
+  Zwei Modi (Einstellung „Buchungsmodus“, Standard: automatisch):
+
+  ● Warenkorb-Buchung (Feature „Mehrere Leistungen pro Buchung“):
+    Leistungen kommen als Produkte aus einer Kollektion (Standard:
+    „detailing-services“). Kund:innen wählen mehrere Leistungen als
+    Checkbox-Karten, sehen Zwischensumme + Gesamtdauer im Summary-Panel
+    und landen per AJAX Cart API (/cart/add.js) mit allen Leistungen als
+    separate Positionen im Warenkorb/Checkout. Wunschtermin, Fahrzeug,
+    Kennzeichen und Telefon werden als Line-Item-Properties an jeder
+    Position gespeichert, das Buchungsdatum zusätzlich als Cart-Attribut.
+
+  ● Anfrage-Formular (bisheriges Verhalten, automatischer Fallback ohne
+    Produkte): Shopifys Kontaktformular — funktioniert ohne JS und ohne
+    Produkte; Cowlendar-App-Blöcke ("@app") werden in beiden Modi gerendert.
 {%- endcomment -%}
 
 {%- liquid
@@ -15,6 +22,39 @@
   assign service_options = section.settings.service_options | newline_to_br | split: '<br />'
   assign time_options = section.settings.time_options | newline_to_br | split: '<br />'
   assign aside_steps = section.settings.aside_steps | newline_to_br | split: '<br />'
+
+  # Leistungs-Quelle wie in den Services-Sections
+  assign services_collection = section.settings.services_collection
+  if services_collection == blank
+    assign services_collection = collections['detailing-services']
+  endif
+
+  # Modus auflösen: auto → Warenkorb, sobald Produkte existieren
+  assign mode = section.settings.mode
+  if mode == 'auto'
+    if services_collection != blank and services_collection.products_count > 0
+      assign mode = 'cart'
+    else
+      assign mode = 'form'
+    endif
+  elsif mode == 'cart'
+    unless services_collection != blank and services_collection.products_count > 0
+      assign mode = 'form'
+    endunless
+  endif
+
+  assign redirect_path = '/checkout'
+  if section.settings.redirect == 'cart'
+    assign redirect_path = routes.cart_url
+  endif
+
+  # TODO (optional): Bereits ausgebuchte Wochenenden über das Shop-Metafeld
+  # booking.blocked_dates (Liste von Datumswerten "YYYY-MM-DD") pflegen.
+  # Der Stub reicht die Daten bereits an den Kalender in main.js durch.
+  assign blocked_dates_json = '[]'
+  if shop.metafields.booking.blocked_dates.value != blank
+    assign blocked_dates_json = shop.metafields.booking.blocked_dates.value | json
+  endif
 -%}
 
 <section class="section"
@@ -30,7 +70,180 @@
           {%- endif -%}
         {%- endfor -%}
 
-        {%- if section.settings.show_form -%}
+        {%- if mode == 'cart' -%}
+
+          {%- comment -%} Konfiguration & Strings für assets/main.js {%- endcomment -%}
+          <script type="application/json" data-booking-config>
+            {
+              "cartAddUrl": {{ routes.cart_add_url | append: '.js' | json }},
+              "cartUpdateUrl": {{ routes.cart_update_url | append: '.js' | json }},
+              "redirect": {{ redirect_path | json }},
+              "currency": {{ cart.currency.iso_code | json }},
+              "maxDays": {{ section.settings.booking_window_days | default: 90 }},
+              "blockedDates": {{ blocked_dates_json }},
+              "strings": {
+                "approx": {{ 'booking.approx' | t | json }},
+                "hour": {{ 'booking.hours_short' | t | json }},
+                "minute": {{ 'booking.minutes_short' | t | json }},
+                "errorNoService": {{ 'booking.error_no_service' | t | json }},
+                "errorDate": {{ 'booking.error_date' | t | json }},
+                "errorAdd": {{ 'booking.error_add' | t | json }},
+                "adding": {{ 'booking.adding' | t | json }},
+                "serviceSingular": {{ 'booking.service_singular' | t | json }},
+                "servicePlural": {{ 'booking.service_plural' | t | json }}
+              }
+            }
+          </script>
+
+          <noscript>
+            <p class="form-error">{{ 'booking.noscript' | t }}</p>
+          </noscript>
+
+          <div data-booking-cart>
+            <ol class="booking-progress" data-booking-progress aria-hidden="true">
+              <li class="booking-progress__item is-active">1. {{ 'booking.step_services' | t }}</li>
+              <li class="booking-progress__item">2. {{ 'booking.step_date' | t }}</li>
+              <li class="booking-progress__item">3. {{ 'booking.step_contact' | t }}</li>
+            </ol>
+
+            <div class="form-error" data-booking-error role="alert" tabindex="-1" hidden></div>
+
+            <fieldset class="booking-step is-active" data-booking-step="1"
+              data-next-label="{{ section.settings.next_to_date_label | escape }}">
+              <legend>{{ 'booking.step_services' | t }}</legend>
+
+              <div class="service-select-grid" data-service-grid role="group" aria-label="{{ 'booking.step_services' | t }}">
+                {%- for product in services_collection.products -%}
+                  {%- liquid
+                    assign variant = product.selected_or_first_available_variant
+                    assign duration_minutes = product.metafields.custom.duration_minutes.value | default: 0
+                    assign short_text = product.metafields.custom.short_description.value | default: product.description | strip_html | truncate: 90
+                  -%}
+                  <label class="service-select{% unless product.available %} service-select--soldout{% endunless %}">
+                    <input type="checkbox" class="visually-hidden service-select__input"
+                      value="{{ variant.id }}"
+                      data-service-checkbox
+                      data-handle="{{ product.handle }}"
+                      data-title="{{ product.title | escape }}"
+                      data-price-cents="{{ variant.price }}"
+                      data-duration="{{ duration_minutes }}"
+                      aria-label="{{ product.title | escape }}, {{ variant.price | money }}"
+                      {% unless product.available %}disabled{% endunless %}>
+                    <span class="service-select__check" aria-hidden="true">
+                      {%- render 'icon', name: 'check', size: 14 -%}
+                    </span>
+                    {% render 'responsive-image',
+                      image: product.featured_image,
+                      alt: '',
+                      sizes: '72px',
+                      aspect: '1 / 1',
+                      class: 'service-select__thumb',
+                      placeholder: 'product-apparel-1'
+                    %}
+                    <span class="service-select__body">
+                      <span class="service-select__title">{{ product.title | escape }}</span>
+                      {%- if short_text != blank -%}
+                        <span class="service-select__desc">{{ short_text }}</span>
+                      {%- endif -%}
+                      <span class="service-select__meta">
+                        {{ variant.price | money }}
+                        {%- if duration_minutes != 0 %} · {% render 'duration', minutes: duration_minutes %}{% endif -%}
+                        {%- unless product.available %} · {{ 'booking.sold_out' | t }}{% endunless -%}
+                      </span>
+                    </span>
+                  </label>
+                {%- endfor -%}
+              </div>
+            </fieldset>
+
+            <fieldset class="booking-step" data-booking-step="2"
+              data-next-label="{{ section.settings.next_to_contact_label | escape }}">
+              <legend>{{ 'booking.step_date' | t }}</legend>
+
+              <div class="form-grid">
+                <div class="field field--full booking-calendar" data-booking-calendar>
+                  <label class="field__label" for="BookingDate">{{ 'booking.field_date' | t }} <span class="req" aria-hidden="true">*</span></label>
+                  {%- comment -%}
+                    Natives Date-Input als Basis — main.js wertet es zum
+                    Flatpickr-Wochenend-Kalender auf (Progressive Enhancement).
+                  {%- endcomment -%}
+                  <input class="field__input" type="date" id="BookingDate"
+                    data-booking-date data-min-today required>
+                  <p class="booking-hint">
+                    {%- render 'icon', name: 'calendar', size: 17 -%}
+                    {{ section.settings.weekend_note }}
+                  </p>
+                </div>
+                <div class="field">
+                  <label class="field__label" for="BookingTime">{{ 'booking.field_time' | t }}</label>
+                  <select class="field__input" id="BookingTime" data-booking-time>
+                    {%- for option in time_options -%}
+                      {%- assign opt = option | strip -%}
+                      {%- if opt != blank -%}<option value="{{ opt | escape }}">{{ opt }}</option>{%- endif -%}
+                    {%- endfor -%}
+                  </select>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="booking-step" data-booking-step="3">
+              <legend>{{ 'booking.step_contact' | t }}</legend>
+
+              <div class="form-grid">
+                <div class="field">
+                  <label class="field__label" for="BookingVehicle">{{ 'booking.field_vehicle' | t }} <span class="req" aria-hidden="true">*</span></label>
+                  <select class="field__input" id="BookingVehicle" data-booking-vehicle required>
+                    <option value="" disabled selected>{{ 'booking.choose' | t }}</option>
+                    {%- for option in vehicle_options -%}
+                      {%- assign opt = option | strip -%}
+                      {%- if opt != blank -%}<option value="{{ opt | escape }}">{{ opt }}</option>{%- endif -%}
+                    {%- endfor -%}
+                  </select>
+                </div>
+                <div class="field">
+                  <label class="field__label" for="BookingPlate">{{ 'booking.field_plate' | t }}</label>
+                  <input class="field__input" type="text" id="BookingPlate" data-booking-plate
+                    autocomplete="off" placeholder="I-123XY">
+                  <span class="field__hint">{{ 'booking.field_plate_hint' | t }}</span>
+                </div>
+                <div class="field">
+                  <label class="field__label" for="BookingPhone">{{ 'booking.field_phone' | t }} <span class="req" aria-hidden="true">*</span></label>
+                  <input class="field__input" type="tel" id="BookingPhone" data-booking-phone
+                    autocomplete="tel" required>
+                </div>
+                <div class="field field--full">
+                  <label class="field__label" for="BookingNote">{{ 'booking.field_message' | t }}</label>
+                  <textarea class="field__input" id="BookingNote" data-booking-note
+                    placeholder="{{ section.settings.message_placeholder | escape }}"></textarea>
+                </div>
+                <div class="field field--full">
+                  <label class="checkbox-field">
+                    <input type="checkbox" data-booking-privacy required>
+                    <span>Ich stimme zu, dass meine Angaben zur Bearbeitung der Buchung verarbeitet werden.
+                      Details in der <a href="/policies/privacy-policy">Datenschutzerklärung</a>. <span class="req" aria-hidden="true">*</span></span>
+                  </label>
+                </div>
+              </div>
+            </fieldset>
+
+            <div class="booking-nav">
+              <button class="btn btn--outline" type="button" data-booking-prev hidden>{{ 'booking.back' | t }}</button>
+              <button class="btn btn--primary" type="button" data-booking-next>{{ section.settings.next_to_date_label }}</button>
+              <button class="btn btn--primary btn--lg" type="button" data-booking-submit hidden>
+                <span data-booking-submit-label>{{ section.settings.submit_cart_label }}</span>
+                {%- render 'icon', name: 'arrow-right', size: 18 -%}
+              </button>
+            </div>
+
+            {%- if section.settings.response_note != blank -%}
+              <p class="booking-hint">
+                {%- render 'icon', name: 'clock', size: 17 -%}
+                {{ section.settings.response_note }}
+              </p>
+            {%- endif -%}
+          </div>
+
+        {%- elsif section.settings.show_form -%}
           {%- form 'contact', id: 'BookingForm' -%}
 
             {%- if form.posted_successfully? -%}
@@ -77,8 +290,8 @@
                         aria-invalid="{% if form.errors contains 'email' %}true{% else %}false{% endif %}">
                     </div>
                     <div class="field field--full">
-                      <label class="field__label" for="BookingPhone">Telefon</label>
-                      <input class="field__input" type="tel" id="BookingPhone" name="contact[phone]" autocomplete="tel">
+                      <label class="field__label" for="BookingPhoneLegacy">Telefon</label>
+                      <input class="field__input" type="tel" id="BookingPhoneLegacy" name="contact[phone]" autocomplete="tel">
                       <span class="field__hint">Für schnelle Rückfragen – optional.</span>
                     </div>
                   </div>
@@ -88,9 +301,9 @@
                   <legend>Fahrzeug & Leistung</legend>
                   <div class="form-grid">
                     <div class="field">
-                      <label class="field__label" for="BookingVehicle">Fahrzeugtyp <span class="req" aria-hidden="true">*</span></label>
-                      <select class="field__input" id="BookingVehicle" name="contact[Fahrzeugtyp]" required>
-                        <option value="" disabled selected>Bitte wählen …</option>
+                      <label class="field__label" for="BookingVehicleLegacy">Fahrzeugtyp <span class="req" aria-hidden="true">*</span></label>
+                      <select class="field__input" id="BookingVehicleLegacy" name="contact[Fahrzeugtyp]" required>
+                        <option value="" disabled selected>{{ 'booking.choose' | t }}</option>
                         {%- for option in vehicle_options -%}
                           {%- assign opt = option | strip -%}
                           {%- if opt != blank -%}<option value="{{ opt | escape }}">{{ opt }}</option>{%- endif -%}
@@ -100,7 +313,7 @@
                     <div class="field">
                       <label class="field__label" for="BookingService">Gewünschte Leistung <span class="req" aria-hidden="true">*</span></label>
                       <select class="field__input" id="BookingService" name="contact[Leistung]" required>
-                        <option value="" disabled selected>Bitte wählen …</option>
+                        <option value="" disabled selected>{{ 'booking.choose' | t }}</option>
                         {%- for option in service_options -%}
                           {%- assign opt = option | strip -%}
                           {%- if opt != blank -%}<option value="{{ opt | escape }}">{{ opt }}</option>{%- endif -%}
@@ -114,12 +327,12 @@
                   <legend>Wunschtermin & Details</legend>
                   <div class="form-grid">
                     <div class="field">
-                      <label class="field__label" for="BookingDate">Wunschtermin <span class="req" aria-hidden="true">*</span></label>
-                      <input class="field__input" type="date" id="BookingDate" name="contact[Wunschtermin]" required data-min-today>
+                      <label class="field__label" for="BookingDateLegacy">Wunschtermin <span class="req" aria-hidden="true">*</span></label>
+                      <input class="field__input" type="date" id="BookingDateLegacy" name="contact[Wunschtermin]" required data-min-today>
                     </div>
                     <div class="field">
-                      <label class="field__label" for="BookingTime">Tageszeit</label>
-                      <select class="field__input" id="BookingTime" name="contact[Tageszeit]">
+                      <label class="field__label" for="BookingTimeLegacy">Tageszeit</label>
+                      <select class="field__input" id="BookingTimeLegacy" name="contact[Tageszeit]">
                         {%- for option in time_options -%}
                           {%- assign opt = option | strip -%}
                           {%- if opt != blank -%}<option value="{{ opt | escape }}">{{ opt }}</option>{%- endif -%}
@@ -142,7 +355,7 @@
                 </fieldset>
 
                 <div class="booking-nav">
-                  <button class="btn btn--outline" type="button" data-booking-prev hidden>Zurück</button>
+                  <button class="btn btn--outline" type="button" data-booking-prev hidden>{{ 'booking.back' | t }}</button>
                   <button class="btn btn--primary" type="button" data-booking-next>Weiter</button>
                   <button class="btn btn--primary btn--lg" type="submit" data-booking-submit>
                     <span>Anfrage senden</span>
@@ -164,6 +377,32 @@
       </div>
 
       <aside>
+        {%- if mode == 'cart' -%}
+          {%- comment -%}
+            Summary-Panel: immer gerendert (kein Layout-Shift), Desktop sticky.
+            aria-live informiert Screenreader über Auswahl-Änderungen.
+          {%- endcomment -%}
+          <div class="aside-card booking-summary" data-booking-summary aria-live="polite">
+            <h3>{{ 'booking.summary_title' | t }}</h3>
+            <p class="booking-summary__empty text-muted" data-summary-empty>{{ 'booking.summary_empty' | t }}</p>
+            <ul class="booking-summary__list" data-summary-list hidden></ul>
+            <div class="booking-summary__totals" data-summary-totals hidden>
+              <div class="booking-summary__row">
+                <span>{{ 'booking.subtotal' | t }}</span>
+                <strong data-summary-subtotal></strong>
+              </div>
+              <div class="booking-summary__row">
+                <span>{{ 'booking.duration_total' | t }}</span>
+                <span data-summary-duration></span>
+              </div>
+              <div class="booking-summary__row" data-summary-date-row hidden>
+                <span>{{ 'booking.selected_date' | t }}</span>
+                <span data-summary-date></span>
+              </div>
+            </div>
+          </div>
+        {%- endif -%}
+
         <div class="aside-card">
           <h3>{{ section.settings.aside_contact_heading }}</h3>
           <p class="text-muted">{{ section.settings.aside_contact_text }}</p>
@@ -194,12 +433,90 @@
 
     </div>
   </div>
+
+  {%- if mode == 'cart' -%}
+    {%- comment -%} Mobile Bottom-Bar: kompakte Zusammenfassung (Desktop: Aside) {%- endcomment -%}
+    <div class="booking-minibar" data-booking-minibar>
+      <strong data-minibar-count>0</strong>
+      <span data-minibar-total></span>
+      <span class="booking-minibar__duration" data-minibar-duration></span>
+    </div>
+  {%- endif -%}
 </section>
 
 {% schema %}
 {
   "name": "Buchungsformular",
   "settings": [
+    {
+      "type": "select",
+      "id": "mode",
+      "label": "Buchungsmodus",
+      "options": [
+        { "value": "auto", "label": "Automatisch (Warenkorb, sobald Produkte existieren)" },
+        { "value": "cart", "label": "Warenkorb-Buchung (Leistungen als Produkte)" },
+        { "value": "form", "label": "Anfrage-Formular (E-Mail)" }
+      ],
+      "default": "auto"
+    },
+    {
+      "type": "collection",
+      "id": "services_collection",
+      "label": "Leistungs-Kollektion",
+      "info": "Leer = automatisch „detailing-services“."
+    },
+    {
+      "type": "select",
+      "id": "redirect",
+      "label": "Nach der Buchung weiterleiten zu",
+      "options": [
+        { "value": "checkout", "label": "Checkout" },
+        { "value": "cart", "label": "Warenkorb" }
+      ],
+      "default": "checkout"
+    },
+    {
+      "type": "range",
+      "id": "booking_window_days",
+      "label": "Buchbarer Zeitraum",
+      "min": 30,
+      "max": 180,
+      "step": 15,
+      "unit": "Tg",
+      "default": 90
+    },
+    {
+      "type": "text",
+      "id": "weekend_note",
+      "label": "Hinweis unter dem Kalender",
+      "default": "Termine sind nur am Wochenende verfügbar. Wir melden uns innerhalb von 24 Stunden zur Bestätigung."
+    },
+    {
+      "type": "header",
+      "content": "Beschriftungen (Warenkorb-Modus)"
+    },
+    {
+      "type": "text",
+      "id": "next_to_date_label",
+      "label": "Button: weiter zu Schritt 2",
+      "default": "Weiter zur Terminauswahl"
+    },
+    {
+      "type": "text",
+      "id": "next_to_contact_label",
+      "label": "Button: weiter zu Schritt 3",
+      "default": "Weiter zu deinen Daten"
+    },
+    {
+      "type": "text",
+      "id": "submit_cart_label",
+      "label": "Button: Abschluss",
+      "default": "Weiter zur Kasse"
+    },
+    {
+      "type": "header",
+      "content": "Anfrage-Formular (Fallback-Modus)"
+    },
     {
       "type": "checkbox",
       "id": "show_form",
@@ -216,7 +533,7 @@
     {
       "type": "textarea",
       "id": "service_options",
-      "label": "Leistungen (eine pro Zeile)",
+      "label": "Leistungen (eine pro Zeile, nur Anfrage-Formular)",
       "default": "Außenreinigung\nInnenreinigung\nPolitur & Lackpflege\nKeramikversiegelung\nScheinwerfer-Aufbereitung\nKomplettpaket\nIndividuelle Anfrage"
     },
     {
@@ -239,7 +556,7 @@
     },
     {
       "type": "header",
-      "content": "Erfolgsmeldung"
+      "content": "Erfolgsmeldung (Anfrage-Formular)"
     },
     {
       "type": "text",
@@ -285,7 +602,7 @@
       "type": "textarea",
       "id": "aside_steps",
       "label": "Ablauf-Schritte (einer pro Zeile)",
-      "default": "Du schickst uns deine Anfrage.\nWir bestätigen Termin & Preis innerhalb von 24 Stunden.\nWir holen dein Auto ab oder du kommst vorbei."
+      "default": "Du schickst uns deine Buchung.\nWir bestätigen Termin & Preis innerhalb von 24 Stunden.\nWir holen dein Auto ab oder du kommst vorbei."
     },
     {
       "type": "range",
