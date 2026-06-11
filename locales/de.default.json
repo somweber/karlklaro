@@ -43,5 +43,12 @@
     "label": "Passwort",
     "submit": "Öffnen",
     "error": "Falsches Passwort – bitte erneut versuchen."
+  },
+  "booking": {
+    "from_price": "ab",
+    "approx": "ca.",
+    "hours_short": "Std.",
+    "minutes_short": "Min.",
+    "collection_empty": "Aktuell sind keine Leistungen hinterlegt. Lege im Shopify-Admin Produkte an und ordne sie der Kollektion „detailing-services“ zu."
   }
 }

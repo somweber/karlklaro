@@ -1,0 +1,15 @@
+{%- comment -%}
+  snippets/duration.liquid — Formatiert Minuten als „ca. 1 Std. 30 Min.“
+  Parameter: minutes (Integer, z. B. aus product.metafields.custom.duration_minutes)
+  Strings kommen aus locales/de.default.json (booking.*).
+{%- endcomment -%}
+{%- liquid
+  assign m = minutes | times: 1
+  assign h = m | divided_by: 60
+  assign rem = m | modulo: 60
+-%}
+{{- 'booking.approx' | t }} {% if h > 0 -%}
+  {{- h }} {{ 'booking.hours_short' | t }}{% if rem > 0 %} {{ rem }} {{ 'booking.minutes_short' | t }}{% endif -%}
+{%- else -%}
+  {{- m }} {{ 'booking.minutes_short' | t -}}
+{%- endif -%}

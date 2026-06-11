@@ -1932,3 +1932,42 @@ body:has(.sticky-cta) { padding-bottom: 76px; }
   outline-offset: 3px;
   border-radius: 2px;
 }
+
+/* ── 15 Leistungen aus Produkten ────────────────────────────── */
+/* Karten im Produkt-Modus: echtes Produktbild statt Icon-Badge */
+.service-card__media {
+  margin: calc(var(--space-xl) * -1) calc(var(--space-xl) * -1) var(--space-xs);
+}
+
+.service-card__media .media {
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+}
+
+.service-card__facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-xs) var(--space-md);
+}
+
+.service-card__price {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-accent);
+  white-space: nowrap;
+}
+
+.service-card--product .btn {
+  margin-top: var(--space-xs);
+  align-self: start;
+}
+
+.service-item__media {
+  margin: calc(var(--space-xl) * -1) calc(var(--space-xl) * -1) var(--space-xs);
+}
+
+.service-item__media .media {
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+}

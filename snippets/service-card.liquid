@@ -1,21 +1,72 @@
 {%- comment -%}
-  snippets/service-card.liquid — Leistungs-Karte (Startseite & Übersichten).
-  Parameter: icon, title, text, url, link_label, attrs (block.shopify_attributes),
-             reveal_delay (Sekunden, für gestaffelte Einblendung)
+  snippets/service-card.liquid — Leistungs-Karte. Zwei Modi:
+
+  1) Produkt-Modus: `product` wird übergeben — Titel, Bild, Preis und
+     Beschreibung kommen aus dem Shopify-Produkt (Pflege im Admin, kein Code).
+     Optionale Metafelder: custom.short_description (Kurztext),
+     custom.duration_minutes (Dauer). Der CTA führt zur Buchungsseite und
+     wählt die Leistung dort vor (?services=<handle>, siehe main.js).
+
+  2) Manueller Modus (bisheriges Verhalten): icon/title/text/url aus
+     Theme-Editor-Blöcken.
+
+  Parameter Produkt-Modus: product, cta_label, booking_url (optional)
+  Parameter manueller Modus: icon, title, text, url, link_label, attrs
+  Gemeinsam: reveal_delay (Sekunden, gestaffelte Einblendung)
 {%- endcomment -%}
-<article class="service-card" data-reveal
-  {%- if reveal_delay %} style="--reveal-delay: {{ reveal_delay }}s"{% endif %} {{ attrs }}>
-  {%- if icon != blank and icon != 'none' -%}
-    <span class="icon-badge">{% render 'icon', name: icon, size: 26 %}</span>
-  {%- endif -%}
-  <h3>{{ title | escape }}</h3>
-  {%- if text != blank -%}
-    <p class="service-card__text">{{ text }}</p>
-  {%- endif -%}
-  {%- if url != blank -%}
-    <a class="service-card__link" href="{{ url }}">
-      {{ link_label | default: 'Mehr erfahren' }}
-      {%- render 'icon', name: 'arrow-right', size: 18 -%}
-    </a>
-  {%- endif -%}
-</article>
+{%- if product != blank -%}
+  {%- liquid
+    assign card_text = product.metafields.custom.short_description.value | default: product.description | strip_html | truncate: 140
+    assign duration_minutes = product.metafields.custom.duration_minutes.value
+    assign target_url = booking_url | default: settings.booking_url | default: '/pages/buchung'
+  -%}
+  <article class="service-card service-card--product" data-reveal
+    {%- if reveal_delay %} style="--reveal-delay: {{ reveal_delay }}s"{% endif %}>
+    <div class="service-card__media">
+      {%- comment -%} Bild-Fallback: ohne featured_image greift der Marken-Platzhalter {%- endcomment -%}
+      {% render 'responsive-image',
+        image: product.featured_image,
+        alt: product.title,
+        sizes: '(min-width: 990px) 320px, (min-width: 750px) 45vw, 100vw',
+        aspect: '4 / 3',
+        placeholder: 'product-apparel-1'
+      %}
+    </div>
+    <h3>{{ product.title | escape }}</h3>
+    {%- if card_text != blank -%}
+      <p class="service-card__text">{{ card_text }}</p>
+    {%- endif -%}
+    <div class="service-card__facts">
+      <span class="service-card__price">
+        {%- if product.price_varies %}{{ 'booking.from_price' | t }} {% endif -%}
+        {{ product.price | money }}
+      </span>
+      {%- if duration_minutes != blank -%}
+        <span class="service-item__meta">
+          {%- render 'icon', name: 'clock', size: 16 -%}
+          {%- render 'duration', minutes: duration_minutes -%}
+        </span>
+      {%- endif -%}
+    </div>
+    {%- if cta_label != blank -%}
+      <a class="btn btn--outline btn--sm" href="{{ target_url }}?services={{ product.handle }}">{{ cta_label }}</a>
+    {%- endif -%}
+  </article>
+{%- else -%}
+  <article class="service-card" data-reveal
+    {%- if reveal_delay %} style="--reveal-delay: {{ reveal_delay }}s"{% endif %} {{ attrs }}>
+    {%- if icon != blank and icon != 'none' -%}
+      <span class="icon-badge">{% render 'icon', name: icon, size: 26 %}</span>
+    {%- endif -%}
+    <h3>{{ title | escape }}</h3>
+    {%- if text != blank -%}
+      <p class="service-card__text">{{ text }}</p>
+    {%- endif -%}
+    {%- if url != blank -%}
+      <a class="service-card__link" href="{{ url }}">
+        {{ link_label | default: 'Mehr erfahren' }}
+        {%- render 'icon', name: 'arrow-right', size: 18 -%}
+      </a>
+    {%- endif -%}
+  </article>
+{%- endif -%}
