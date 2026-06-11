@@ -1,3 +1,20 @@
 {
-  "current": {}
+  "current": {
+    "booking_url": "/pages/buchung",
+    "sections": {
+      "header": {
+        "type": "header",
+        "settings": {
+          "menu": "klaroclean-hauptmenu"
+        }
+      },
+      "footer": {
+        "type": "footer",
+        "settings": {
+          "menu": "klaroclean-footer",
+          "legal_menu": "klaroclean-rechtliches"
+        }
+      }
+    }
+  }
 }
