@@ -195,8 +195,7 @@
         "type": "url",
         "id": "booking_url",
         "label": "Buchungsseite",
-        "default": "/pages/buchung",
-        "info": "Ziel aller „Termin buchen“-Buttons."
+        "info": "Ziel aller „Termin buchen“-Buttons. Empfohlen: die Seite „Buchung“ (/pages/buchung)."
       },
       {
         "type": "checkbox",
