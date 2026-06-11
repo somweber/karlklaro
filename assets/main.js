@@ -480,11 +480,55 @@
   }
 
   /* ── Wochenend-Kalender (Flatpickr) ──────────────────────────
-     Stub — wird mit Feature 3 implementiert. Ohne Flatpickr bleibt
-     das native Date-Input mit Wochenend-Validierung aktiv. */
+     Wertet das native Date-Input zum Inline-Kalender auf, in dem nur
+     Samstage und Sonntage wählbar sind. Ohne geladenes Flatpickr bleibt
+     das native Input mit Wochenend-Validierung (validateStep) aktiv. */
   function initBookingCalendar(root, config, onDate) {
-    // TODO(Feature 3): Flatpickr-Init (nur Wochenenden, inline, de-Locale)
-    void root; void config; void onDate;
+    var input = root.querySelector('[data-booking-date]');
+    if (!input || typeof window.flatpickr !== 'function') return;
+
+    // Deutsche Locale, sofern das l10n-Bundle geladen ist
+    // (de bringt Wochenstart Montag bereits mit — wir erzwingen ihn explizit)
+    var locale = (window.flatpickr.l10ns && window.flatpickr.l10ns.de) || 'default';
+    if (typeof locale === 'object') locale.firstDayOfWeek = 1;
+
+    var maxDate = new Date();
+    maxDate.setDate(maxDate.getDate() + (config.maxDays || 90));
+
+    var toIso = function (date) {
+      return date.getFullYear() + '-' +
+        String(date.getMonth() + 1).padStart(2, '0') + '-' +
+        String(date.getDate()).padStart(2, '0');
+    };
+
+    window.flatpickr(input, {
+      locale: locale,
+      dateFormat: 'Y-m-d',
+      altInput: true,
+      altFormat: 'l, j. F Y', // „Samstag, 14. Juni 2026“
+      minDate: 'today',
+      maxDate: maxDate,
+      inline: true, // Kalender dauerhaft sichtbar statt Popup
+      disable: [
+        function (date) {
+          // Alles AUSSER Samstag (6) und Sonntag (0) deaktivieren
+          var day = date.getDay();
+          if (day !== 0 && day !== 6) return true;
+          // Gesperrte Termine aus dem Shop-Metafeld booking.blocked_dates
+          // (Liste "YYYY-MM-DD"). TODO: ausgebuchte Wochenenden künftig
+          // automatisiert pflegen — der Stub ist bereits verdrahtet.
+          return Array.isArray(config.blockedDates) &&
+            config.blockedDates.indexOf(toIso(date)) !== -1;
+        }
+      ],
+      onChange: function (dates, dateStr, instance) {
+        onDate(dates.length ? instance.altInput.value : '');
+      }
+    });
+
+    // Das ersetzte Original-Input ist nicht mehr fokussierbar → native
+    // Validierung überspringen; validateStep übernimmt die Datumsprüfung.
+    input.dataset.skipNative = '1';
   }
 
   /* ── Anfrage-Formular (Fallback-Modus) ───────────────────── */

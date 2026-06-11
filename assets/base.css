@@ -2148,3 +2148,87 @@ body:has(.booking-minibar) { padding-bottom: 64px; }
   .booking-minibar { display: none; }
   body:has(.booking-minibar) { padding-bottom: 0; }
 }
+
+/* ── 17 Flatpickr: dunkles Marken-Theme ─────────────────────── */
+/* Überschreibt nur Farben/Flächen des CDN-Stylesheets (scoped auf
+   .booking-calendar) — die Flatpickr-Quelle bleibt unangetastet. */
+.booking-calendar .flatpickr-calendar {
+  background: var(--color-bg);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  box-shadow: none;
+  margin-top: var(--space-sm);
+  font-family: var(--font-body);
+}
+
+.booking-calendar .flatpickr-calendar::before,
+.booking-calendar .flatpickr-calendar::after {
+  display: none; /* Popup-Pfeil – beim Inline-Kalender überflüssig */
+}
+
+.booking-calendar .flatpickr-months .flatpickr-month {
+  color: var(--color-text);
+  fill: var(--color-text);
+}
+
+.booking-calendar .flatpickr-current-month .flatpickr-monthDropdown-months,
+.booking-calendar .flatpickr-current-month input.cur-year {
+  color: var(--color-text);
+  background: transparent;
+}
+
+.booking-calendar .flatpickr-current-month .flatpickr-monthDropdown-months .flatpickr-monthDropdown-month {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.booking-calendar .flatpickr-months .flatpickr-prev-month svg,
+.booking-calendar .flatpickr-months .flatpickr-next-month svg {
+  fill: var(--color-text-muted);
+}
+
+.booking-calendar .flatpickr-months .flatpickr-prev-month:hover svg,
+.booking-calendar .flatpickr-months .flatpickr-next-month:hover svg {
+  fill: var(--color-accent);
+}
+
+.booking-calendar span.flatpickr-weekday {
+  color: var(--color-text-muted);
+}
+
+.booking-calendar .flatpickr-day {
+  color: var(--color-text);
+  border-radius: var(--radius-sm);
+}
+
+.booking-calendar .flatpickr-day:hover,
+.booking-calendar .flatpickr-day:focus {
+  background: var(--color-surface-2);
+  border-color: transparent;
+}
+
+.booking-calendar .flatpickr-day.today {
+  border-color: var(--color-accent);
+}
+
+.booking-calendar .flatpickr-day.selected,
+.booking-calendar .flatpickr-day.selected:hover {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+/* Werktage: deutlich ausgegraut, aber lesbar (nicht unsichtbar) */
+.booking-calendar .flatpickr-day.flatpickr-disabled,
+.booking-calendar .flatpickr-day.flatpickr-disabled:hover,
+.booking-calendar .flatpickr-day.prevMonthDay,
+.booking-calendar .flatpickr-day.nextMonthDay {
+  color: var(--color-text-muted);
+  opacity: 0.35;
+  background: transparent;
+}
+
+/* Vom Kalender erzeugtes Anzeige-Feld (altInput) */
+.booking-calendar input.flatpickr-input[readonly] {
+  cursor: default;
+}
