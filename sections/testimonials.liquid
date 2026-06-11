@@ -1,0 +1,146 @@
+{%- comment -%}
+  sections/testimonials.liquid — Kundenstimmen mit Sterne-Bewertung.
+{%- endcomment -%}
+
+<section class="section section--{{ section.settings.background }}"
+  style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+  <div class="page-width">
+    <header class="section-head" data-reveal>
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      <h2>{{ section.settings.heading }}</h2>
+    </header>
+
+    <div class="grid" style="--cols: 3; --cols-md: 2;">
+      {%- for block in section.blocks -%}
+        <blockquote class="testimonial" data-reveal style="--reveal-delay: {{ forloop.index0 | times: 0.08 }}s" {{ block.shopify_attributes }}>
+          {% render 'rating-stars', rating: block.settings.rating %}
+          <p class="testimonial__quote">{{ block.settings.quote }}</p>
+          <footer>
+            <cite class="testimonial__author">{{ block.settings.author | escape }}</cite>
+            {%- if block.settings.vehicle != blank -%}
+              <p class="testimonial__meta">{{ block.settings.vehicle | escape }}</p>
+            {%- endif -%}
+          </footer>
+        </blockquote>
+      {%- endfor -%}
+    </div>
+
+    {%- if section.settings.more_label != blank and section.settings.more_url != blank -%}
+      <div class="testimonials__more">
+        {% render 'button', label: section.settings.more_label, url: section.settings.more_url, style: 'ghost', icon: 'arrow-right', external: true %}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Kundenstimmen",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Overline",
+      "default": "Kundenstimmen"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Überschrift",
+      "default": "Was unsere Kunden sagen."
+    },
+    {
+      "type": "text",
+      "id": "more_label",
+      "label": "Link unten: Text",
+      "default": "Alle Bewertungen auf Google ansehen"
+    },
+    {
+      "type": "url",
+      "id": "more_url",
+      "label": "Link unten: Ziel",
+      "info": "z. B. Link zum Google-Business-Profil"
+    },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Hintergrund",
+      "options": [
+        { "value": "base", "label": "Standard (dunkel)" },
+        { "value": "surface", "label": "Anthrazit" },
+        { "value": "navy", "label": "Navy" }
+      ],
+      "default": "base"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Abstand oben",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Abstand unten",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 96
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Kundenstimme",
+      "limit": 9,
+      "settings": [
+        {
+          "type": "range",
+          "id": "rating",
+          "label": "Bewertung",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        },
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Zitat",
+          "default": "Mein Auto sieht besser aus als bei der Abholung vom Händler. Absolute Empfehlung!"
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Name",
+          "default": "Markus H."
+        },
+        {
+          "type": "text",
+          "id": "vehicle",
+          "label": "Fahrzeug / Leistung",
+          "default": "BMW 530d · Politur & Keramik"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Kundenstimmen",
+      "category": "KlaroClean",
+      "blocks": [
+        { "type": "testimonial" },
+        { "type": "testimonial", "settings": { "quote": "Hund, Kinder, Skiausrüstung – unser Innenraum war eine Katastrophe. Jetzt riecht und glänzt alles wie neu.", "author": "Verena S.", "vehicle": "VW Tiguan · Innenreinigung" } },
+        { "type": "testimonial", "settings": { "quote": "Die Keramikversiegelung wurde top erklärt und perfekt umgesetzt. Das Wasser perlt einfach ab – Wahnsinn.", "author": "Stefan K.", "vehicle": "Audi RS4 · Keramik Pro" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

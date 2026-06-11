@@ -1,0 +1,138 @@
+{%- comment -%}
+  sections/team-grid.liquid — Team-Vorstellung (3 Gründer).
+{%- endcomment -%}
+
+<section class="section section--{{ section.settings.background }}"
+  style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+  <div class="page-width">
+    <header class="section-head" data-reveal>
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      <h2>{{ section.settings.heading }}</h2>
+      {%- if section.settings.text != blank -%}
+        <p class="section-head__lead">{{ section.settings.text }}</p>
+      {%- endif -%}
+    </header>
+
+    <div class="grid" style="--cols: 3; --cols-md: 3;">
+      {%- for block in section.blocks -%}
+        <div class="team-card" data-reveal style="--reveal-delay: {{ forloop.index0 | times: 0.08 }}s" {{ block.shopify_attributes }}>
+          {% render 'responsive-image',
+            image: block.settings.image,
+            alt: block.settings.name,
+            sizes: '(min-width: 990px) 380px, (min-width: 750px) 33vw, 100vw',
+            placeholder: 'collection-apparel-1'
+          %}
+          <div>
+            <h3>{{ block.settings.name | escape }}</h3>
+            <p class="team-card__role">{{ block.settings.role | escape }}</p>
+          </div>
+          {%- if block.settings.bio != blank -%}
+            <p class="team-card__bio">{{ block.settings.bio }}</p>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Team",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Overline",
+      "default": "Das Team"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Überschrift",
+      "default": "Drei Gründer. Ein Anspruch."
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Einleitung"
+    },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Hintergrund",
+      "options": [
+        { "value": "base", "label": "Standard (dunkel)" },
+        { "value": "surface", "label": "Anthrazit" },
+        { "value": "navy", "label": "Navy" }
+      ],
+      "default": "surface"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Abstand oben",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Abstand unten",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 96
+    }
+  ],
+  "blocks": [
+    {
+      "type": "member",
+      "name": "Teammitglied",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Foto",
+          "info": "Hochformat 4:5 empfohlen"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Name",
+          "default": "Elias"
+        },
+        {
+          "type": "text",
+          "id": "role",
+          "label": "Rolle",
+          "default": "Gründer · Lack & Politur"
+        },
+        {
+          "type": "textarea",
+          "id": "bio",
+          "label": "Kurzbio",
+          "default": "Perfektionist an der Poliermaschine – gibt den Lack erst frei, wenn er unter Halogenlicht besteht."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Team",
+      "category": "KlaroClean",
+      "blocks": [
+        { "type": "member" },
+        { "type": "member", "settings": { "name": "Samuel", "role": "Gründer · Interieur", "bio": "Kennt jede Ritze im Innenraum – und hat für jeden Fleck die passende Antwort." } },
+        { "type": "member", "settings": { "name": "Jakob", "role": "Gründer · Keramik & Versiegelung", "bio": "Zertifizierter Keramik-Spezialist. Sorgt dafür, dass der Glanz nicht nur heute hält." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

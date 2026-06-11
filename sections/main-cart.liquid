@@ -1,0 +1,71 @@
+{%- comment -%}
+  sections/main-cart.liquid — Warenkorb (relevant für Gutscheine/Produkte).
+  Klassisches Formular ohne JS: Mengen ändern + „Aktualisieren“ / „Zur Kasse“.
+{%- endcomment -%}
+
+<section class="section" style="--pt: 48px; --pb: 96px;">
+  <div class="page-width page-width--narrow">
+    <header class="section-head">
+      <h1>{{ 'cart.title' | t }}</h1>
+    </header>
+
+    {%- if cart.item_count == 0 -%}
+      <div class="status-page" style="padding-block: var(--space-2xl);">
+        <p class="lead">{{ 'cart.empty' | t }}</p>
+        {%- assign continue_label = 'cart.continue' | t -%}
+        {% render 'button', label: continue_label, url: routes.root_url, style: 'primary' %}
+      </div>
+    {%- else -%}
+      <form action="{{ routes.cart_url }}" method="post">
+        <div class="cart-lines">
+          {%- for item in cart.items -%}
+            <div class="cart-line">
+              {% render 'responsive-image',
+                image: item.image,
+                alt: item.title,
+                sizes: '88px',
+                aspect: '1',
+                placeholder: 'product-apparel-1'
+              %}
+              <div>
+                <p class="cart-line__title"><a href="{{ item.url }}">{{ item.product.title }}</a></p>
+                {%- unless item.product.has_only_default_variant -%}
+                  <p class="cart-line__meta">{{ item.variant.title }}</p>
+                {%- endunless -%}
+                <p class="cart-line__meta">{{ item.final_price | money }}</p>
+                <a class="cart-line__remove" href="{{ item.url_to_remove }}">
+                  {%- render 'icon', name: 'trash', size: 15 -%}
+                  {{ 'cart.remove' | t }}
+                </a>
+              </div>
+              <div class="field">
+                <label class="visually-hidden" for="Quantity-{{ forloop.index }}">{{ 'cart.quantity' | t }}</label>
+                <input class="field__input qty-input" type="number" id="Quantity-{{ forloop.index }}"
+                  name="updates[]" value="{{ item.quantity }}" min="0">
+              </div>
+            </div>
+          {%- endfor -%}
+        </div>
+
+        <div class="cart-footer">
+          <div class="cart-subtotal">
+            <span>{{ 'cart.subtotal' | t }}</span>
+            <span>{{ cart.total_price | money }}</span>
+          </div>
+          <p class="text-muted" style="font-size: 0.85rem;">{{ 'cart.taxes_note' | t }}</p>
+          <div style="display: flex; gap: var(--space-md); flex-wrap: wrap;">
+            <button class="btn btn--outline" type="submit" name="update">{{ 'cart.update' | t }}</button>
+            <button class="btn btn--primary" type="submit" name="checkout">{{ 'cart.checkout' | t }}</button>
+          </div>
+        </div>
+      </form>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Warenkorb",
+  "settings": []
+}
+{% endschema %}

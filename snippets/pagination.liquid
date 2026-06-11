@@ -1,0 +1,27 @@
+{%- comment -%}
+  snippets/pagination.liquid — Seitennummerierung.
+  Parameter: paginate (paginate-Objekt aus dem paginate-Tag)
+{%- endcomment -%}
+{%- if paginate.pages > 1 -%}
+  <nav class="pagination" aria-label="Seitennavigation">
+    {%- if paginate.previous -%}
+      <a class="pagination__item" href="{{ paginate.previous.url }}" aria-label="{{ 'general.previous' | t }}">
+        {%- render 'icon', name: 'chevron-left', size: 18 -%}
+      </a>
+    {%- endif -%}
+    {%- for part in paginate.parts -%}
+      {%- if part.is_link -%}
+        <a class="pagination__item" href="{{ part.url }}">{{ part.title }}</a>
+      {%- elsif part.title == paginate.current_page -%}
+        <span class="pagination__item pagination__item--current" aria-current="page">{{ part.title }}</span>
+      {%- else -%}
+        <span class="pagination__item">{{ part.title }}</span>
+      {%- endif -%}
+    {%- endfor -%}
+    {%- if paginate.next -%}
+      <a class="pagination__item" href="{{ paginate.next.url }}" aria-label="{{ 'general.next' | t }}">
+        {%- render 'icon', name: 'chevron-right', size: 18 -%}
+      </a>
+    {%- endif -%}
+  </nav>
+{%- endif -%}

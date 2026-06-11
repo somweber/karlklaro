@@ -1,0 +1,63 @@
+{%- comment -%}
+  layout/theme.liquid — Basis-Layout für alle Seiten.
+  - Lädt Design-Tokens (snippets/css-variables.liquid), base.css und main.js
+  - Rendert Header + Footer als statische Sections (im Theme-Editor anpassbar)
+  - Globaler Sticky-Buchungs-Button (mobil) via snippets/sticky-booking-cta.liquid
+{%- endcomment -%}
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="{{ settings.color_bg }}">
+
+    {%- if settings.favicon != blank -%}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 64, height: 64 }}">
+    {%- endif -%}
+
+    <title>
+      {{- page_title -}}
+      {%- unless page_title contains shop.name %} – {{ shop.name }}{% endunless -%}
+    </title>
+
+    {%- render 'meta-tags' -%}
+
+    {%- comment -%}
+      Schrift-Strategie (Design-Annahme):
+      Standardmäßig werden die Markenschriften Space Grotesk (Display) und Inter (Fließtext)
+      von Google Fonts geladen — sie treffen die geometrisch-technische Markenrichtung exakt.
+      Über "Theme-Einstellungen → Typografie" kann stattdessen auf Shopify-gehostete
+      Schriften (font_picker) umgestellt werden, z. B. aus Performance-Gründen.
+    {%- endcomment -%}
+    {%- if settings.use_brand_fonts -%}
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    {%- else -%}
+      <style>
+        {{ settings.font_heading | font_face: font_display: 'swap' }}
+        {{ settings.font_body | font_face: font_display: 'swap' }}
+      </style>
+    {%- endif -%}
+
+    {%- render 'css-variables' -%}
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+    <script src="{{ 'main.js' | asset_url }}" defer="defer"></script>
+
+    {{ content_for_header }}
+  </head>
+
+  <body class="template-{{ template.name }}{% if template.suffix != blank %} template--{{ template.suffix }}{% endif %}">
+    <a class="skip-link" href="#MainContent">{{ 'general.skip_to_content' | t }}</a>
+
+    {% section 'header' %}
+
+    <main id="MainContent" class="main-content" role="main" tabindex="-1">
+      {{ content_for_layout }}
+    </main>
+
+    {% section 'footer' %}
+
+    {%- render 'sticky-booking-cta' -%}
+  </body>
+</html>

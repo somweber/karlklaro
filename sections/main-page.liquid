@@ -1,0 +1,52 @@
+{%- comment -%}
+  sections/main-page.liquid — Standard-Seiteninhalt (Fallback für alle
+  Shopify-Seiten ohne eigenes Template, z. B. Impressum).
+{%- endcomment -%}
+
+<section class="section"
+  style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+  <div class="page-width page-width--narrow">
+    {%- if section.settings.show_title -%}
+      <header class="section-head">
+        <h1>{{ page.title }}</h1>
+      </header>
+    {%- endif -%}
+    <div class="rte">
+      {{ page.content }}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Seiteninhalt",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_title",
+      "label": "Seitentitel anzeigen",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Abstand oben",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Abstand unten",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 96
+    }
+  ]
+}
+{% endschema %}

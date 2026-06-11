@@ -1,0 +1,24 @@
+{
+  "sections": {
+    "hero": {
+      "type": "page-hero",
+      "settings": {
+        "eyebrow": "Kontakt",
+        "heading": "Sag uns, was dein Auto braucht.",
+        "text": "Ob kurze Frage oder individuelles Angebot – wir antworten schnell, ehrlich und unverbindlich.",
+        "compact": true
+      }
+    },
+    "contact": {
+      "type": "contact",
+      "settings": {
+        "form_heading": "Schreib uns",
+        "show_map": true,
+        "map_dark": true,
+        "padding_top": 72,
+        "padding_bottom": 96
+      }
+    }
+  },
+  "order": ["hero", "contact"]
+}

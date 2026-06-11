@@ -1,0 +1,170 @@
+{%- comment -%}
+  sections/image-with-text.liquid — Bild-Text-Split („Über uns“-Story u. a.).
+  Optional bis zu 3 Fakten-Blöcke (z. B. „3 Gründer“, „100 % Handarbeit“).
+{%- endcomment -%}
+
+<section class="section section--{{ section.settings.background }}"
+  style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+  <div class="page-width">
+    <div class="split{% if section.settings.layout == 'right' %} split--reverse{% endif %}">
+
+      <div class="split__media" data-reveal>
+        {% render 'responsive-image',
+          image: section.settings.image,
+          alt: section.settings.image_alt,
+          sizes: '(min-width: 990px) 50vw, 100vw',
+          aspect: '4 / 3.4',
+          placeholder: 'lifestyle-1'
+        %}
+      </div>
+
+      <div class="split__content" data-reveal style="--reveal-delay: 0.1s">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="eyebrow">{{ section.settings.eyebrow }}</p>
+        {%- endif -%}
+
+        <h2>{{ section.settings.heading }}</h2>
+
+        {%- if section.settings.text != blank -%}
+          <div class="rte">{{ section.settings.text }}</div>
+        {%- endif -%}
+
+        {%- if section.blocks.size > 0 -%}
+          <div class="split__facts">
+            {%- for block in section.blocks -%}
+              <div class="fact" {{ block.shopify_attributes }}>
+                <p class="fact__value">{{ block.settings.value | escape }}</p>
+                <p class="fact__label">{{ block.settings.label | escape }}</p>
+              </div>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+        {%- if section.settings.cta_label != blank and section.settings.cta_url != blank -%}
+          {% render 'button', label: section.settings.cta_label, url: section.settings.cta_url, style: 'outline' %}
+        {%- endif -%}
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Bild & Text",
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Bildposition (Desktop)",
+      "options": [
+        { "value": "left", "label": "Links" },
+        { "value": "right", "label": "Rechts" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Bild"
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Alt-Text",
+      "default": "Das KlaroClean-Team bei der Arbeit"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Overline",
+      "default": "Unsere Geschichte"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Überschrift",
+      "default": "Aus Leidenschaft wurde Präzision."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>KlaroClean wurde von drei Freunden aus Innsbruck gegründet, die eines verbindet: die Überzeugung, dass Autopflege Handwerk ist. Was in einer Garage mit Poliermaschine und viel Geduld begann, ist heute ein professioneller Detailing-Betrieb für ganz Tirol.</p><p>Wir arbeiten ausschließlich mit Produkten, die wir selbst getestet haben – und geben kein Fahrzeug aus der Hand, bevor es unserem eigenen Anspruch genügt.</p>"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button-Text"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Button-Ziel"
+    },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Hintergrund",
+      "options": [
+        { "value": "base", "label": "Standard (dunkel)" },
+        { "value": "surface", "label": "Anthrazit" },
+        { "value": "navy", "label": "Navy" }
+      ],
+      "default": "base"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Abstand oben",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Abstand unten",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 96
+    }
+  ],
+  "blocks": [
+    {
+      "type": "fact",
+      "name": "Fakt",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "text",
+          "id": "value",
+          "label": "Wert",
+          "default": "3"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Beschriftung",
+          "default": "Gründer"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bild & Text",
+      "category": "KlaroClean",
+      "blocks": [
+        { "type": "fact" },
+        { "type": "fact", "settings": { "value": "200+", "label": "Fahrzeuge" } },
+        { "type": "fact", "settings": { "value": "100 %", "label": "Handarbeit" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

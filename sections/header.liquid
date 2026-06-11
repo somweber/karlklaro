@@ -1,0 +1,144 @@
+{%- comment -%}
+  sections/header.liquid — Sticky-Header mit Desktop-Navigation,
+  Buchungs-CTA und mobilem Vollbild-Menü (Hamburger).
+  Scroll-Zustand (.is-scrolled) setzt assets/main.js.
+{%- endcomment -%}
+
+{%- liquid
+  assign menu = section.settings.menu
+  assign cta_url = section.settings.cta_url | default: settings.booking_url
+  assign cta_label = section.settings.cta_label | default: settings.booking_label
+-%}
+
+<header class="site-header" data-header>
+  <div class="page-width site-header__inner">
+    <a class="site-header__logo" href="{{ routes.root_url }}" aria-label="{{ shop.name }} – Startseite">
+      {%- if section.settings.logo != blank -%}
+        {{ section.settings.logo | image_url: width: 440 | image_tag:
+          class: 'site-header__logo-img',
+          widths: '220, 440',
+          style: section.settings.logo_width | prepend: 'width: ' | append: 'px',
+          alt: shop.name
+        }}
+      {%- else -%}
+        {%- comment -%} Fallback-Wortmarke, solange kein Logo hochgeladen ist {%- endcomment -%}
+        <span class="site-header__wordmark">Klaro<span class="accent">Clean</span></span>
+      {%- endif -%}
+    </a>
+
+    <nav class="site-header__nav" aria-label="Hauptnavigation">
+      <ul>
+        {%- for link in menu.links -%}
+          <li>
+            <a href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.title }}</a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+
+    <div class="site-header__actions">
+      {%- if settings.show_cart -%}
+        <a class="site-header__cart" href="{{ routes.cart_url }}" aria-label="{{ 'cart.title' | t }} ({{ cart.item_count }})">
+          {%- render 'icon', name: 'cart', size: 22 -%}
+          {%- if cart.item_count > 0 -%}
+            <span class="cart-count" aria-hidden="true">{{ cart.item_count }}</span>
+          {%- endif -%}
+        </a>
+      {%- endif -%}
+
+      {%- if cta_url != blank -%}
+        <a class="btn btn--primary btn--sm site-header__cta" href="{{ cta_url }}">{{ cta_label }}</a>
+      {%- endif -%}
+
+      <button class="site-header__burger" type="button" data-menu-toggle
+        aria-expanded="false" aria-controls="MobileMenu">
+        <span class="visually-hidden">{{ 'general.menu' | t }}</span>
+        {%- render 'icon', name: 'menu', size: 26 -%}
+        {%- render 'icon', name: 'close', size: 26 -%}
+      </button>
+    </div>
+  </div>
+
+  <nav id="MobileMenu" class="mobile-menu" hidden aria-label="Mobiles Menü">
+    <div class="mobile-menu__nav">
+      {%- for link in menu.links -%}
+        <a class="mobile-menu__link" href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>
+          {{ link.title }}
+        </a>
+      {%- endfor -%}
+    </div>
+
+    <div class="mobile-menu__meta">
+      {%- if cta_url != blank -%}
+        <a class="btn btn--primary btn--block" href="{{ cta_url }}">{{ cta_label }}</a>
+      {%- endif -%}
+
+      {%- if settings.contact_phone != blank -%}
+        <a href="tel:{{ settings.contact_phone | replace: ' ', '' }}">{{ settings.contact_phone }}</a>
+      {%- endif -%}
+      {%- if settings.contact_email != blank -%}
+        <a href="mailto:{{ settings.contact_email }}">{{ settings.contact_email }}</a>
+      {%- endif -%}
+
+      <div class="social-row">
+        {%- if settings.social_instagram != blank -%}
+          <a class="social-row__link" href="{{ settings.social_instagram }}" target="_blank" rel="noopener" aria-label="Instagram">
+            {%- render 'icon', name: 'instagram', size: 20 -%}
+          </a>
+        {%- endif -%}
+        {%- if settings.maps_link != blank -%}
+          <a class="social-row__link" href="{{ settings.maps_link }}" target="_blank" rel="noopener" aria-label="Google Maps">
+            {%- render 'icon', name: 'map-pin', size: 20 -%}
+          </a>
+        {%- endif -%}
+      </div>
+    </div>
+  </nav>
+</header>
+
+{% schema %}
+{
+  "name": "Header",
+  "class": "section-header",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo",
+      "info": "SVG oder PNG mit transparentem Hintergrund empfohlen. Ohne Logo wird die Wortmarke „KlaroClean“ angezeigt."
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "label": "Logo-Breite",
+      "min": 80,
+      "max": 240,
+      "step": 10,
+      "unit": "px",
+      "default": 140
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Hauptmenü",
+      "default": "main-menu"
+    },
+    {
+      "type": "header",
+      "content": "Buchungs-Button"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button-Text",
+      "default": "Termin buchen"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Button-Ziel",
+      "info": "Leer lassen, um die globale Buchungs-URL aus den Theme-Einstellungen zu verwenden."
+    }
+  ]
+}
+{% endschema %}

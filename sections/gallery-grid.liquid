@@ -1,0 +1,217 @@
+{%- comment -%}
+  sections/gallery-grid.liquid — Masonry-Galerie mit Kategorie-Filter.
+  Zwei Block-Typen: normales Bild oder interaktives Vorher/Nachher-Paar.
+  Die Filterleiste zeigt nur Kategorien, die tatsächlich verwendet werden.
+{%- endcomment -%}
+
+{%- liquid
+  # Verwendete Kategorien einsammeln (eindeutig, in Block-Reihenfolge)
+  assign used = ''
+  for block in section.blocks
+    assign cat = block.settings.category
+    unless used contains cat
+      assign used = used | append: cat | append: ','
+    endunless
+  endfor
+  assign used_cats = used | split: ','
+-%}
+
+<section class="section"
+  style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+  <div class="page-width" data-gallery>
+
+    {%- if section.settings.show_filters and used_cats.size > 1 -%}
+      <div class="gallery-filters" role="group" aria-label="Galerie filtern">
+        <button class="filter-btn" type="button" data-filter="all" aria-pressed="true">Alle</button>
+        {%- for cat in used_cats -%}
+          {%- case cat -%}
+            {%- when 'aussen' -%}{%- assign cat_label = 'Außenreinigung' -%}
+            {%- when 'innen' -%}{%- assign cat_label = 'Innenreinigung' -%}
+            {%- when 'politur' -%}{%- assign cat_label = 'Politur & Lack' -%}
+            {%- when 'keramik' -%}{%- assign cat_label = 'Keramik' -%}
+            {%- else -%}{%- assign cat_label = 'Details' -%}
+          {%- endcase -%}
+          <button class="filter-btn" type="button" data-filter="{{ cat }}" aria-pressed="false">{{ cat_label }}</button>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    <div class="masonry">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+
+          {%- when 'image' -%}
+            <figure class="gallery-card" data-category="{{ block.settings.category }}" data-reveal {{ block.shopify_attributes }}>
+              {% render 'responsive-image',
+                image: block.settings.image,
+                alt: block.settings.alt,
+                sizes: '(min-width: 990px) 400px, (min-width: 600px) 45vw, 100vw',
+                placeholder: 'lifestyle-2',
+                class: 'media--plain'
+              %}
+              {%- if block.settings.caption != blank -%}
+                <figcaption class="gallery-card__caption">
+                  <span class="gallery-card__tag">{{ block.settings.tag | escape }}</span>
+                  {{ block.settings.caption | escape }}
+                </figcaption>
+              {%- endif -%}
+            </figure>
+
+          {%- when 'compare' -%}
+            <div data-category="{{ block.settings.category }}" data-reveal {{ block.shopify_attributes }}>
+              {% render 'compare-slider',
+                image_before: block.settings.image_before,
+                image_after: block.settings.image_after,
+                alt_before: block.settings.alt_before,
+                alt_after: block.settings.alt_after,
+                aspect: '4 / 3',
+                sizes: '(min-width: 990px) 400px, (min-width: 600px) 45vw, 100vw'
+              %}
+              {%- if block.settings.caption != blank -%}
+                <p class="compare-figure figcaption text-muted" style="margin-top: var(--space-sm); font-size: 0.9rem;">{{ block.settings.caption | escape }}</p>
+              {%- endif -%}
+            </div>
+
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Galerie",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_filters",
+      "label": "Filterleiste anzeigen",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Abstand oben",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Abstand unten",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 96
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Bild",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Bild"
+        },
+        {
+          "type": "text",
+          "id": "alt",
+          "label": "Alt-Text",
+          "default": "Aufbereitetes Fahrzeug in Detailaufnahme"
+        },
+        {
+          "type": "select",
+          "id": "category",
+          "label": "Kategorie (Filter)",
+          "options": [
+            { "value": "aussen", "label": "Außenreinigung" },
+            { "value": "innen", "label": "Innenreinigung" },
+            { "value": "politur", "label": "Politur & Lack" },
+            { "value": "keramik", "label": "Keramik" },
+            { "value": "detail", "label": "Details" }
+          ],
+          "default": "aussen"
+        },
+        {
+          "type": "text",
+          "id": "tag",
+          "label": "Kategorie-Label auf dem Bild",
+          "default": "Außenreinigung"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Bildunterschrift",
+          "default": "Frisch versiegelter Lack mit Tiefenglanz"
+        }
+      ]
+    },
+    {
+      "type": "compare",
+      "name": "Vorher/Nachher-Paar",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image_before",
+          "label": "Bild „Vorher“"
+        },
+        {
+          "type": "text",
+          "id": "alt_before",
+          "label": "Alt-Text „Vorher“",
+          "default": "Fahrzeug vor der Aufbereitung"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_after",
+          "label": "Bild „Nachher“"
+        },
+        {
+          "type": "text",
+          "id": "alt_after",
+          "label": "Alt-Text „Nachher“",
+          "default": "Fahrzeug nach der Aufbereitung"
+        },
+        {
+          "type": "select",
+          "id": "category",
+          "label": "Kategorie (Filter)",
+          "options": [
+            { "value": "aussen", "label": "Außenreinigung" },
+            { "value": "innen", "label": "Innenreinigung" },
+            { "value": "politur", "label": "Politur & Lack" },
+            { "value": "keramik", "label": "Keramik" },
+            { "value": "detail", "label": "Details" }
+          ],
+          "default": "politur"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Bildunterschrift",
+          "default": "Mehrstufige Politur"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Galerie",
+      "category": "KlaroClean",
+      "blocks": [
+        { "type": "compare" },
+        { "type": "image" },
+        { "type": "image", "settings": { "category": "innen", "tag": "Innenreinigung", "caption": "Innenraum nach der Tiefenreinigung" } },
+        { "type": "image", "settings": { "category": "keramik", "tag": "Keramik", "caption": "Abperleffekt nach Keramikversiegelung" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

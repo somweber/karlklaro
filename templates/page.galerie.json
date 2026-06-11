@@ -1,0 +1,130 @@
+{
+  "sections": {
+    "hero": {
+      "type": "page-hero",
+      "settings": {
+        "eyebrow": "Galerie",
+        "heading": "Unsere Arbeit. Dein Maßstab.",
+        "text": "Echte Ergebnisse statt Stockfotos: Vorher/Nachher-Vergleiche, Detailaufnahmen und fertige Fahrzeuge aus unserer Werkstatt."
+      }
+    },
+    "gallery": {
+      "type": "gallery-grid",
+      "blocks": {
+        "compare-1": {
+          "type": "compare",
+          "settings": {
+            "alt_before": "Stumpfer Lack mit Kratzern vor der Politur",
+            "alt_after": "Hochglanzlack nach mehrstufiger Politur",
+            "category": "politur",
+            "caption": "Mehrstufige Politur – BMW 3er"
+          }
+        },
+        "img-1": {
+          "type": "image",
+          "settings": {
+            "alt": "Frisch versiegelter Lack mit Tiefenglanz",
+            "category": "aussen",
+            "tag": "Außenreinigung",
+            "caption": "Frisch gewaschen & versiegelt"
+          }
+        },
+        "img-2": {
+          "type": "image",
+          "settings": {
+            "alt": "Wassertropfen perlen auf keramikversiegeltem Lack ab",
+            "category": "keramik",
+            "tag": "Keramik",
+            "caption": "Abperleffekt nach Keramik Pro"
+          }
+        },
+        "img-3": {
+          "type": "image",
+          "settings": {
+            "alt": "Gereinigter Fahrzeuginnenraum mit gepflegtem Leder",
+            "category": "innen",
+            "tag": "Innenreinigung",
+            "caption": "Lederpflege mit UV-Schutz"
+          }
+        },
+        "compare-2": {
+          "type": "compare",
+          "settings": {
+            "alt_before": "Verschmutzter Innenraum vor der Aufbereitung",
+            "alt_after": "Innenraum nach der Tiefenreinigung",
+            "category": "innen",
+            "caption": "Innenreinigung Komplett – Familien-SUV"
+          }
+        },
+        "img-4": {
+          "type": "image",
+          "settings": {
+            "alt": "Spiegelnde Motorhaube unter Studiolicht",
+            "category": "politur",
+            "tag": "Politur & Lack",
+            "caption": "Spiegelfinish unter Studiolicht"
+          }
+        },
+        "img-5": {
+          "type": "image",
+          "settings": {
+            "alt": "Detailaufnahme einer frisch gereinigten Felge",
+            "category": "detail",
+            "tag": "Details",
+            "caption": "Felgen nach der Intensivreinigung"
+          }
+        },
+        "img-6": {
+          "type": "image",
+          "settings": {
+            "alt": "Wasserperlen auf frisch gewachstem Autolack",
+            "category": "aussen",
+            "tag": "Außenreinigung",
+            "caption": "Wasserperlen auf frischem Wachs"
+          }
+        },
+        "img-7": {
+          "type": "image",
+          "settings": {
+            "alt": "Tiefenglanz auf dunklem Lack nach Versiegelung",
+            "category": "keramik",
+            "tag": "Keramik",
+            "caption": "Tiefenglanz nach der Versiegelung"
+          }
+        },
+        "img-8": {
+          "type": "image",
+          "settings": {
+            "alt": "Gereinigter und konservierter Motorraum",
+            "category": "detail",
+            "tag": "Details",
+            "caption": "Motorraum gereinigt & konserviert"
+          }
+        }
+      },
+      "block_order": [
+        "compare-1", "img-1", "img-2", "img-3",
+        "compare-2", "img-4", "img-5", "img-6", "img-7", "img-8"
+      ],
+      "settings": {
+        "show_filters": true,
+        "padding_top": 48,
+        "padding_bottom": 96
+      }
+    },
+    "cta": {
+      "type": "cta-banner",
+      "settings": {
+        "heading": "Dein Auto könnte das nächste sein.",
+        "text": "Überzeug dich selbst – buch jetzt deinen Termin.",
+        "cta_label": "Jetzt Termin buchen",
+        "cta_url": "/pages/buchung",
+        "show_phone": false,
+        "align": "center",
+        "padding_top": 0,
+        "padding_bottom": 96
+      }
+    }
+  },
+  "order": ["hero", "gallery", "cta"]
+}

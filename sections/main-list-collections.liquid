@@ -1,0 +1,40 @@
+{%- comment -%}
+  sections/main-list-collections.liquid — Übersicht aller Kollektionen.
+{%- endcomment -%}
+
+<section class="section" style="--pt: 48px; --pb: 96px;">
+  <div class="page-width">
+    <header class="section-head">
+      <h1>{{ section.settings.heading }}</h1>
+    </header>
+
+    <div class="grid" style="--cols: 3; --cols-md: 2;">
+      {%- for collection in collections -%}
+        <a class="product-card" href="{{ collection.url }}">
+          {% render 'responsive-image',
+            image: collection.featured_image,
+            alt: collection.title,
+            sizes: '(min-width: 990px) 400px, 45vw',
+            aspect: '4 / 3',
+            placeholder: 'collection-apparel-1'
+          %}
+          <h2 class="product-card__title">{{ collection.title | escape }}</h2>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Kollektionsliste",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Überschrift",
+      "default": "Kollektionen"
+    }
+  ]
+}
+{% endschema %}

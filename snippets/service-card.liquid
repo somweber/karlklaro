@@ -1,0 +1,21 @@
+{%- comment -%}
+  snippets/service-card.liquid — Leistungs-Karte (Startseite & Übersichten).
+  Parameter: icon, title, text, url, link_label, attrs (block.shopify_attributes),
+             reveal_delay (Sekunden, für gestaffelte Einblendung)
+{%- endcomment -%}
+<article class="service-card" data-reveal
+  {%- if reveal_delay %} style="--reveal-delay: {{ reveal_delay }}s"{% endif %} {{ attrs }}>
+  {%- if icon != blank and icon != 'none' -%}
+    <span class="icon-badge">{% render 'icon', name: icon, size: 26 %}</span>
+  {%- endif -%}
+  <h3>{{ title | escape }}</h3>
+  {%- if text != blank -%}
+    <p class="service-card__text">{{ text }}</p>
+  {%- endif -%}
+  {%- if url != blank -%}
+    <a class="service-card__link" href="{{ url }}">
+      {{ link_label | default: 'Mehr erfahren' }}
+      {%- render 'icon', name: 'arrow-right', size: 18 -%}
+    </a>
+  {%- endif -%}
+</article>

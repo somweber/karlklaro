@@ -1,0 +1,68 @@
+{%- comment -%}
+  snippets/icon.liquid — Inline-SVG-Icons (Stroke: currentColor).
+  Verwendung: {% render 'icon', name: 'shield', size: 24 %}
+  Inline statt Sprite: kein Extra-Request, färbbar über CSS.
+{%- endcomment -%}
+{%- liquid
+  assign size = size | default: 24
+-%}
+<svg class="icon icon--{{ name }}" width="{{ size }}" height="{{ size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  {%- case name -%}
+    {%- when 'menu' -%}
+      <line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/>
+    {%- when 'close' -%}
+      <line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/>
+    {%- when 'arrow-right' -%}
+      <line x1="4" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/>
+    {%- when 'chevron-left' -%}
+      <polyline points="14.5 5.5 8 12 14.5 18.5"/>
+    {%- when 'chevron-right' -%}
+      <polyline points="9.5 5.5 16 12 9.5 18.5"/>
+    {%- when 'chevron-down' -%}
+      <polyline points="5.5 9.5 12 16 18.5 9.5"/>
+    {%- when 'star' -%}
+      <path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4 6.2 20.5l1.1-6.5L2.6 9.4l6.5-.9z" fill="currentColor" stroke="none"/>
+    {%- when 'check' -%}
+      <polyline points="4 12.5 9.5 18 20 6.5"/>
+    {%- when 'phone' -%}
+      <path d="M5 4h4l1.5 4.5-2.2 1.6a13 13 0 0 0 5.6 5.6l1.6-2.2L20 15v4a1.5 1.5 0 0 1-1.6 1.5C10.6 19.9 4.1 13.4 3.5 5.6A1.5 1.5 0 0 1 5 4z"/>
+    {%- when 'mail' -%}
+      <rect x="3" y="5.5" width="18" height="13" rx="2"/><polyline points="4.5 7.5 12 13 19.5 7.5"/>
+    {%- when 'map-pin' -%}
+      <path d="M12 21.5s-7-6.2-7-11.3A7 7 0 0 1 19 10.2c0 5.1-7 11.3-7 11.3z"/><circle cx="12" cy="10" r="2.6"/>
+    {%- when 'clock' -%}
+      <circle cx="12" cy="12" r="8.5"/><polyline points="12 7.5 12 12 15.5 14"/>
+    {%- when 'calendar' -%}
+      <rect x="3.5" y="5" width="17" height="16" rx="2"/><line x1="3.5" y1="9.5" x2="20.5" y2="9.5"/><line x1="8" y1="3" x2="8" y2="6.5"/><line x1="16" y1="3" x2="16" y2="6.5"/>
+    {%- when 'instagram' -%}
+      <rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/>
+    {%- when 'facebook' -%}
+      <path d="M15.5 8.5V7a1.5 1.5 0 0 1 1.5-1.5h1.5V2.8h-2.4a3.6 3.6 0 0 0-3.6 3.6v2.1H10v3h2.5v9.7h3v-9.7h2.4l.5-3z" fill="currentColor" stroke="none"/>
+    {%- when 'whatsapp' -%}
+      <path d="M12 3.5a8.5 8.5 0 0 0-7.3 12.8L3.5 20.5l4.3-1.1A8.5 8.5 0 1 0 12 3.5z"/><path d="M9 8.8c.3-.8 1-.9 1.4-.3l.7 1c.2.3.2.6 0 .9l-.4.6c.5 1 1.3 1.8 2.3 2.3l.6-.5c.3-.2.6-.2.9 0l1 .7c.6.4.5 1.1-.3 1.4-1 .4-2.4 0-3.9-1.3-1.5-1.3-2.7-3.4-2.3-4.8z" fill="currentColor" stroke="none"/>
+    {%- when 'droplet' -%}
+      <path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>
+    {%- when 'shield' -%}
+      <path d="M12 3l7.5 2.8v5.4c0 4.6-3 8.2-7.5 9.8-4.5-1.6-7.5-5.2-7.5-9.8V5.8z"/><polyline points="8.5 12 11 14.5 15.5 9.5"/>
+    {%- when 'sparkles' -%}
+      <path d="M11 4l1.6 4.4L17 10l-4.4 1.6L11 16l-1.6-4.4L5 10l4.4-1.6z"/><path d="M18.5 14.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/>
+    {%- when 'car' -%}
+      <path d="M5 16.5H3.5v-3.1c0-.5.2-1 .5-1.4L6 9.2A2.5 2.5 0 0 1 8 8h8a2.5 2.5 0 0 1 2 1.2l2 2.8c.3.4.5.9.5 1.4v3.1H19"/><circle cx="7.5" cy="16.5" r="1.8"/><circle cx="16.5" cy="16.5" r="1.8"/><line x1="9.3" y1="16.5" x2="14.7" y2="16.5"/>
+    {%- when 'seat' -%}
+      <path d="M6.5 11V6.5A2.5 2.5 0 0 1 9 4h6a2.5 2.5 0 0 1 2.5 2.5V11"/><path d="M6.5 11A2.5 2.5 0 0 0 4 13.5V19h16v-5.5a2.5 2.5 0 0 0-5-.2V14H9v-.7A2.5 2.5 0 0 0 6.5 11z"/>
+    {%- when 'beam' -%}
+      <path d="M9 6a6 6 0 0 0 0 12c2 0 3.5-2.7 3.5-6S11 6 9 6z"/><line x1="15.5" y1="8" x2="20.5" y2="6.5"/><line x1="16" y1="12" x2="21" y2="12"/><line x1="15.5" y1="16" x2="20.5" y2="17.5"/>
+    {%- when 'heart' -%}
+      <path d="M12 20.5S4 15.2 4 9.9A4.2 4.2 0 0 1 12 7.6a4.2 4.2 0 0 1 8 2.3c0 5.3-8 10.6-8 10.6z"/>
+    {%- when 'gem' -%}
+      <path d="M7 4h10l4 5-9 11L3 9z"/><path d="M3 9h18"/><path d="M9.5 9L12 19.5 14.5 9"/>
+    {%- when 'send' -%}
+      <path d="M21 3L10 14"/><path d="M21 3l-7 18-4-7-7-4z"/>
+    {%- when 'search' -%}
+      <circle cx="11" cy="11" r="6.5"/><line x1="16" y1="16" x2="21" y2="21"/>
+    {%- when 'cart' -%}
+      <path d="M4 4h2l2.4 11.2a1.5 1.5 0 0 0 1.5 1.2h8.3a1.5 1.5 0 0 0 1.5-1.2L21 8H6.4"/><circle cx="10" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/>
+    {%- when 'trash' -%}
+      <path d="M4 7h16"/><path d="M9.5 7V5a1.5 1.5 0 0 1 1.5-1.5h2A1.5 1.5 0 0 1 14.5 5v2"/><path d="M6.5 7l.8 12a2 2 0 0 0 2 1.9h5.4a2 2 0 0 0 2-1.9l.8-12"/>
+  {%- endcase -%}
+</svg>

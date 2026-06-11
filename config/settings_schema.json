@@ -1,0 +1,238 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "KlaroClean",
+    "theme_version": "1.0.0",
+    "theme_author": "KlaroClean",
+    "theme_documentation_url": "https://klaroclean.at",
+    "theme_support_url": "https://klaroclean.at"
+  },
+  {
+    "name": "Marke & Farben",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Markenfarben"
+      },
+      {
+        "type": "paragraph",
+        "content": "Dunkles Premium-Schema: Near-Black-Hintergrund, hoher Kontrast, eine Akzentfarbe."
+      },
+      {
+        "type": "color",
+        "id": "color_bg",
+        "label": "Hintergrund (Near-Black)",
+        "default": "#0C0E12"
+      },
+      {
+        "type": "color",
+        "id": "color_surface",
+        "label": "Fläche / Karten (Anthrazit)",
+        "default": "#14171D"
+      },
+      {
+        "type": "color",
+        "id": "color_navy",
+        "label": "Sekundärfläche (Tiefes Navy)",
+        "default": "#0F1B2E"
+      },
+      {
+        "type": "color",
+        "id": "color_line",
+        "label": "Linien & Rahmen",
+        "default": "#262B33"
+      },
+      {
+        "type": "color",
+        "id": "color_text",
+        "label": "Text (hell)",
+        "default": "#F4F6F8"
+      },
+      {
+        "type": "color",
+        "id": "color_text_muted",
+        "label": "Text gedämpft",
+        "default": "#A6AEB8"
+      },
+      {
+        "type": "color",
+        "id": "color_accent",
+        "label": "Akzentfarbe (Electric Blue)",
+        "default": "#1E90FF",
+        "info": "Wird für Buttons, Links und Hervorhebungen verwendet."
+      }
+    ]
+  },
+  {
+    "name": "Typografie",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "use_brand_fonts",
+        "label": "Markenschriften verwenden (Space Grotesk + Inter)",
+        "default": true,
+        "info": "Lädt die Schriften von Google Fonts. Deaktivieren, um die Shopify-Schriftauswahl unten zu nutzen."
+      },
+      {
+        "type": "font_picker",
+        "id": "font_heading",
+        "label": "Überschriften (Alternative)",
+        "default": "assistant_n7"
+      },
+      {
+        "type": "font_picker",
+        "id": "font_body",
+        "label": "Fließtext (Alternative)",
+        "default": "assistant_n4"
+      }
+    ]
+  },
+  {
+    "name": "Layout & Stil",
+    "settings": [
+      {
+        "type": "range",
+        "id": "page_width",
+        "label": "Maximale Seitenbreite",
+        "min": 1000,
+        "max": 1600,
+        "step": 20,
+        "unit": "px",
+        "default": 1280
+      },
+      {
+        "type": "range",
+        "id": "radius_button",
+        "label": "Button-Rundung",
+        "min": 0,
+        "max": 32,
+        "step": 2,
+        "unit": "px",
+        "default": 10
+      },
+      {
+        "type": "range",
+        "id": "radius_card",
+        "label": "Karten-Rundung",
+        "min": 0,
+        "max": 32,
+        "step": 2,
+        "unit": "px",
+        "default": 16
+      }
+    ]
+  },
+  {
+    "name": "Kontaktdaten",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Zentrale Geschäftsdaten — werden in Footer, Kontaktseite und CTAs verwendet. Keine Daten im Code hinterlegt."
+      },
+      {
+        "type": "text",
+        "id": "contact_phone",
+        "label": "Telefonnummer",
+        "info": "z. B. +43 660 1234567"
+      },
+      {
+        "type": "text",
+        "id": "contact_email",
+        "label": "E-Mail-Adresse",
+        "info": "z. B. hallo@klaroclean.at"
+      },
+      {
+        "type": "textarea",
+        "id": "contact_address",
+        "label": "Adresse / Einsatzgebiet",
+        "default": "Innsbruck, Tirol\nMobil in ganz Tirol unterwegs"
+      },
+      {
+        "type": "textarea",
+        "id": "contact_hours",
+        "label": "Öffnungszeiten",
+        "default": "Mo–Fr: 08:00–18:00 Uhr\nSa: nach Vereinbarung"
+      },
+      {
+        "type": "text",
+        "id": "maps_embed",
+        "label": "Google Maps Embed-URL",
+        "info": "Google Maps → Teilen → „Karte einbetten“ → nur die URL aus src=\"…\" einfügen."
+      },
+      {
+        "type": "url",
+        "id": "maps_link",
+        "label": "Google-Maps-Profil (Link)",
+        "info": "Link zum Google-Business-Profil für Bewertungen und Route."
+      }
+    ]
+  },
+  {
+    "name": "Social Media",
+    "settings": [
+      {
+        "type": "url",
+        "id": "social_instagram",
+        "label": "Instagram-URL"
+      },
+      {
+        "type": "url",
+        "id": "social_facebook",
+        "label": "Facebook-URL"
+      },
+      {
+        "type": "url",
+        "id": "social_whatsapp",
+        "label": "WhatsApp-Link",
+        "info": "z. B. https://wa.me/43660…"
+      }
+    ]
+  },
+  {
+    "name": "Buchung",
+    "settings": [
+      {
+        "type": "url",
+        "id": "booking_url",
+        "label": "Buchungsseite",
+        "default": "/pages/buchung",
+        "info": "Ziel aller „Termin buchen“-Buttons."
+      },
+      {
+        "type": "checkbox",
+        "id": "booking_show_sticky",
+        "label": "Sticky-Buchungs-Button (mobil) anzeigen",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "booking_label",
+        "label": "Beschriftung Buchungs-Button",
+        "default": "Termin buchen"
+      }
+    ]
+  },
+  {
+    "name": "Header & Warenkorb",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "show_cart",
+        "label": "Warenkorb-Icon im Header anzeigen",
+        "default": false,
+        "info": "Nur relevant, wenn Produkte (z. B. Gutscheine, Pflegeprodukte) verkauft werden."
+      }
+    ]
+  },
+  {
+    "name": "Favicon",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Favicon",
+        "info": "Empfohlen: 64 × 64 px"
+      }
+    ]
+  }
+]

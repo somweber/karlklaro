@@ -1,0 +1,31 @@
+{%- comment -%}
+  snippets/compare-slider.liquid — Vorher/Nachher-Vergleichswidget.
+  Der unsichtbare <input type="range"> über der Fläche ist das eigentliche
+  Steuerelement → per Maus ziehbar UND tastaturbedienbar (Pfeiltasten).
+  Parameter: image_before, image_after, alt_before, alt_after,
+             label_before, label_after, aspect, sizes
+{%- endcomment -%}
+{%- liquid
+  assign tag_before = label_before | default: 'Vorher'
+  assign tag_after = label_after | default: 'Nachher'
+  assign ratio = aspect | default: '4 / 3'
+  assign img_sizes = sizes | default: '(min-width: 750px) 680px, 86vw'
+-%}
+<div class="compare" data-compare style="--aspect: {{ ratio }};">
+  <div class="compare__pane compare__pane--after">
+    {% render 'responsive-image', image: image_after, alt: alt_after, sizes: img_sizes, placeholder: 'lifestyle-2', class: 'media--plain' %}
+  </div>
+  <div class="compare__pane compare__pane--before">
+    {% render 'responsive-image', image: image_before, alt: alt_before, sizes: img_sizes, placeholder: 'lifestyle-1', class: 'media--plain' %}
+  </div>
+  <div class="compare__divider" aria-hidden="true">
+    <span class="compare__grip">
+      {%- render 'icon', name: 'chevron-left', size: 14 -%}
+      {%- render 'icon', name: 'chevron-right', size: 14 -%}
+    </span>
+  </div>
+  <input class="compare__range" type="range" min="0" max="100" value="50" step="0.5"
+    aria-label="Bildvergleich: {{ tag_before }} / {{ tag_after }}">
+  <span class="compare__tag compare__tag--before">{{ tag_before }}</span>
+  <span class="compare__tag compare__tag--after">{{ tag_after }}</span>
+</div>

@@ -1,0 +1,111 @@
+{%- comment -%}
+  sections/trust-bar.liquid — Kennzahlen-Leiste (Social Proof).
+  Blocks: Icon + Wert + Beschriftung, z. B. „200+ Fahrzeuge aufbereitet“.
+{%- endcomment -%}
+
+<section class="section section--{{ section.settings.background }}"
+  style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+  <div class="page-width">
+    <div class="trust-grid" style="--trust-cols: {{ section.blocks.size | at_least: 2 }};">
+      {%- for block in section.blocks -%}
+        <div class="trust-item" data-reveal style="--reveal-delay: {{ forloop.index0 | times: 0.08 }}s" {{ block.shopify_attributes }}>
+          {%- if block.settings.icon != 'none' -%}
+            {% render 'icon', name: block.settings.icon, size: 26 %}
+          {%- endif -%}
+          <span class="trust-item__value">{{ block.settings.value | escape }}</span>
+          <span class="trust-item__label">{{ block.settings.label | escape }}</span>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Trust-Bar",
+  "settings": [
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Hintergrund",
+      "options": [
+        { "value": "base", "label": "Standard (dunkel)" },
+        { "value": "surface", "label": "Anthrazit" },
+        { "value": "navy", "label": "Navy" }
+      ],
+      "default": "surface"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Abstand oben",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Abstand unten",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 56
+    }
+  ],
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Kennzahl",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "none", "label": "Kein Icon" },
+            { "value": "car", "label": "Auto" },
+            { "value": "star", "label": "Stern" },
+            { "value": "shield", "label": "Schutzschild" },
+            { "value": "sparkles", "label": "Glanz" },
+            { "value": "droplet", "label": "Wassertropfen" },
+            { "value": "map-pin", "label": "Standort" },
+            { "value": "check", "label": "Haken" },
+            { "value": "gem", "label": "Edelstein" },
+            { "value": "clock", "label": "Uhr" }
+          ],
+          "default": "star"
+        },
+        {
+          "type": "text",
+          "id": "value",
+          "label": "Wert",
+          "default": "200+"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Beschriftung",
+          "default": "Fahrzeuge aufbereitet"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Trust-Bar",
+      "category": "KlaroClean",
+      "blocks": [
+        { "type": "stat", "settings": { "icon": "car", "value": "200+", "label": "Fahrzeuge aufbereitet" } },
+        { "type": "stat", "settings": { "icon": "star", "value": "5,0 ★", "label": "Google-Bewertungen" } },
+        { "type": "stat", "settings": { "icon": "shield", "value": "Zertifiziert", "label": "Keramik-Experten" } },
+        { "type": "stat", "settings": { "icon": "map-pin", "value": "Innsbruck", "label": "& mobil in ganz Tirol" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

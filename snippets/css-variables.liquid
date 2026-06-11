@@ -1,0 +1,87 @@
+{%- comment -%}
+  snippets/css-variables.liquid — ZENTRALE DESIGN-TOKEN-DATEI.
+  Alle Farben, Schriften, Abstände und Radien leben hier als CSS Custom Properties.
+  Quelle: Theme-Einstellungen (config/settings_schema.json) + statische Skalen.
+  base.css konsumiert ausschließlich diese Tokens — keine Hardcoded-Werte in Komponenten.
+{%- endcomment -%}
+
+{%- if settings.use_brand_fonts -%}
+  {%- assign font_heading_stack = "'Space Grotesk', 'Helvetica Neue', Arial, sans-serif" -%}
+  {%- assign font_body_stack = "'Inter', 'Helvetica Neue', Arial, sans-serif" -%}
+  {%- assign font_heading_weight = 700 -%}
+  {%- assign font_body_weight = 400 -%}
+{%- else -%}
+  {%- capture font_heading_stack -%}'{{ settings.font_heading.family }}', {{ settings.font_heading.fallback_families }}{%- endcapture -%}
+  {%- capture font_body_stack -%}'{{ settings.font_body.family }}', {{ settings.font_body.fallback_families }}{%- endcapture -%}
+  {%- assign font_heading_weight = settings.font_heading.weight -%}
+  {%- assign font_body_weight = settings.font_body.weight -%}
+{%- endif -%}
+
+<style>
+  :root {
+    /* ── Farben (Theme-Editor) ─────────────────────────────── */
+    --color-bg: {{ settings.color_bg }};
+    --color-surface: {{ settings.color_surface }};
+    --color-surface-2: {{ settings.color_surface | color_lighten: 4 }};
+    --color-navy: {{ settings.color_navy }};
+    --color-line: {{ settings.color_line }};
+    --color-text: {{ settings.color_text }};
+    --color-text-muted: {{ settings.color_text_muted }};
+    --color-accent: {{ settings.color_accent }};
+    --color-accent-hover: {{ settings.color_accent | color_lighten: 8 }};
+    --color-accent-soft: {{ settings.color_accent | color_modify: 'alpha', 0.12 }};
+    --color-accent-glow: {{ settings.color_accent | color_modify: 'alpha', 0.3 }};
+    /* Dunkle Schrift auf Akzent-Buttons: 6:1 Kontrast auf Electric Blue (WCAG AA).
+       Weiß auf #1E90FF würde AA für normalen Text verfehlen. */
+    --color-on-accent: #0A0C10;
+    --color-star: #F2B33D;
+    --color-error: #FF6B6B;
+    --color-success: #3DDC97;
+
+    /* ── Typografie ────────────────────────────────────────── */
+    --font-heading: {{ font_heading_stack }};
+    --font-body: {{ font_body_stack }};
+    --font-heading-weight: {{ font_heading_weight }};
+    --font-body-weight: {{ font_body_weight }};
+    --tracking-wide: 0.18em;     /* Eyebrows / Overlines (Uppercase) */
+    --tracking-heading: 0.005em; /* Headlines: minimal weit für techn. Look */
+
+    /* ── Layout ────────────────────────────────────────────── */
+    --page-width: {{ settings.page_width }}px;
+    --gutter: 1.25rem;
+    --header-height: 72px;
+
+    /* ── Abstands-Skala ────────────────────────────────────── */
+    --space-2xs: 0.25rem;
+    --space-xs: 0.5rem;
+    --space-sm: 0.75rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+    --space-3xl: 4.5rem;
+
+    /* ── Radien & Schatten ─────────────────────────────────── */
+    --radius-btn: {{ settings.radius_button }}px;
+    --radius-card: {{ settings.radius_card }}px;
+    --radius-sm: 6px;
+    --radius-pill: 999px;
+    --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.35);
+    --shadow-lift: 0 18px 44px rgba(0, 0, 0, 0.5);
+    --glow-accent: 0 0 0 1px var(--color-accent), 0 8px 32px var(--color-accent-glow);
+
+    /* ── Bewegung & Ebenen ─────────────────────────────────── */
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --transition: 0.25s var(--ease);
+    --z-header: 60;
+    --z-drawer: 70;
+    --z-sticky-cta: 50;
+  }
+
+  @media (min-width: 750px) {
+    :root {
+      --gutter: 2.5rem;
+      --header-height: 80px;
+    }
+  }
+</style>

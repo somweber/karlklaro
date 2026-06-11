@@ -1,0 +1,47 @@
+{
+  "general": {
+    "skip_to_content": "Zum Inhalt springen",
+    "menu": "Menü",
+    "previous": "Zurück",
+    "next": "Weiter"
+  },
+  "cart": {
+    "title": "Warenkorb",
+    "empty": "Dein Warenkorb ist leer.",
+    "continue": "Weiter stöbern",
+    "remove": "Entfernen",
+    "quantity": "Menge",
+    "subtotal": "Zwischensumme",
+    "taxes_note": "Inkl. Steuern. Allfällige Versandkosten werden an der Kasse berechnet.",
+    "update": "Warenkorb aktualisieren",
+    "checkout": "Zur Kasse"
+  },
+  "products": {
+    "variant": "Variante",
+    "quantity": "Menge",
+    "add_to_cart": "In den Warenkorb",
+    "sold_out": "Ausverkauft"
+  },
+  "collections": {
+    "empty": "In dieser Kollektion sind noch keine Produkte."
+  },
+  "search": {
+    "title": "Suche",
+    "placeholder": "Wonach suchst du?",
+    "submit": "Suchen",
+    "no_results": "Keine Ergebnisse für „{{ terms }}“. Versuch es mit einem anderen Begriff.",
+    "results_count": {
+      "one": "{{ count }} Ergebnis für „{{ terms }}“",
+      "other": "{{ count }} Ergebnisse für „{{ terms }}“"
+    }
+  },
+  "blog": {
+    "read_more": "Weiterlesen",
+    "back": "Zurück zur Übersicht"
+  },
+  "password": {
+    "label": "Passwort",
+    "submit": "Öffnen",
+    "error": "Falsches Passwort – bitte erneut versuchen."
+  }
+}

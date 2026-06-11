@@ -1,0 +1,226 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "eyebrow": "Auto-Aufbereitung in Innsbruck",
+        "heading": "Dein Auto. Perfekt gepflegt.",
+        "text": "Professionelles Detailing für Lack, Interieur und Felgen – mobil bei dir vor Ort oder in unserer Werkstatt in Innsbruck. Präzision bis ins letzte Detail.",
+        "cta_primary_label": "Jetzt Termin buchen",
+        "cta_primary_url": "/pages/buchung",
+        "cta_secondary_label": "Leistungen entdecken",
+        "cta_secondary_url": "/pages/leistungen",
+        "image_alt": "Hochglanzpoliertes Auto in dunkler Studiobeleuchtung",
+        "overlay": 65,
+        "height": "full",
+        "show_cue": true
+      }
+    },
+    "trust": {
+      "type": "trust-bar",
+      "blocks": {
+        "stat-1": {
+          "type": "stat",
+          "settings": { "icon": "car", "value": "200+", "label": "Fahrzeuge aufbereitet" }
+        },
+        "stat-2": {
+          "type": "stat",
+          "settings": { "icon": "star", "value": "5,0 ★", "label": "Google-Bewertungen" }
+        },
+        "stat-3": {
+          "type": "stat",
+          "settings": { "icon": "shield", "value": "Zertifiziert", "label": "Keramik-Experten" }
+        },
+        "stat-4": {
+          "type": "stat",
+          "settings": { "icon": "map-pin", "value": "Innsbruck", "label": "& mobil in ganz Tirol" }
+        }
+      },
+      "block_order": ["stat-1", "stat-2", "stat-3", "stat-4"],
+      "settings": {
+        "background": "surface",
+        "padding_top": 56,
+        "padding_bottom": 56
+      }
+    },
+    "services": {
+      "type": "services-overview",
+      "blocks": {
+        "service-1": {
+          "type": "service",
+          "settings": {
+            "icon": "droplet",
+            "title": "Außenreinigung",
+            "text": "Schonende Handwäsche, Felgenpflege und Lackreinigung – gründlicher, als es jede Waschanlage kann.",
+            "url": "/pages/leistungen#aussenreinigung",
+            "link_label": "Mehr erfahren"
+          }
+        },
+        "service-2": {
+          "type": "service",
+          "settings": {
+            "icon": "seat",
+            "title": "Innenreinigung",
+            "text": "Tiefenreinigung für Sitze, Teppiche und alle Oberflächen. Dein Innenraum – frisch wie am ersten Tag.",
+            "url": "/pages/leistungen#innenreinigung",
+            "link_label": "Mehr erfahren"
+          }
+        },
+        "service-3": {
+          "type": "service",
+          "settings": {
+            "icon": "sparkles",
+            "title": "Politur & Lackpflege",
+            "text": "Mehrstufige Politur entfernt Kratzer, Hologramme und Mattigkeit – für ein spiegelglattes Finish.",
+            "url": "/pages/leistungen#politur",
+            "link_label": "Mehr erfahren"
+          }
+        },
+        "service-4": {
+          "type": "service",
+          "settings": {
+            "icon": "shield",
+            "title": "Keramikversiegelung",
+            "text": "Langzeitschutz mit extremem Glanz und Abperleffekt – die Königsklasse der Lackpflege.",
+            "url": "/pages/leistungen#keramik",
+            "link_label": "Mehr erfahren"
+          }
+        }
+      },
+      "block_order": ["service-1", "service-2", "service-3", "service-4"],
+      "settings": {
+        "eyebrow": "Unsere Leistungen",
+        "heading": "Pflege, die man sieht.",
+        "text": "Vom gründlichen Frühjahrsputz bis zur mehrjährigen Keramikversiegelung – jede Behandlung in Handarbeit, mit professionellen Produkten.",
+        "columns": 4,
+        "cta_label": "Alle Leistungen ansehen",
+        "cta_url": "/pages/leistungen",
+        "background": "base",
+        "padding_top": 96,
+        "padding_bottom": 96
+      }
+    },
+    "process": {
+      "type": "process-steps",
+      "blocks": {
+        "step-1": {
+          "type": "step",
+          "settings": {
+            "title": "Anfrage senden",
+            "text": "Wähle deine Wunschleistung und schick uns deine Anfrage – online in zwei Minuten erledigt."
+          }
+        },
+        "step-2": {
+          "type": "step",
+          "settings": {
+            "title": "Termin bestätigen",
+            "text": "Wir melden uns innerhalb von 24 Stunden und fixieren deinen Wunschtermin – bei dir vor Ort oder bei uns."
+          }
+        },
+        "step-3": {
+          "type": "step",
+          "settings": {
+            "title": "Ergebnis genießen",
+            "text": "Du übernimmst dein Auto in neuwertigem Zustand – auf Wunsch mit Pflege-Tipps für danach."
+          }
+        }
+      },
+      "block_order": ["step-1", "step-2", "step-3"],
+      "settings": {
+        "eyebrow": "So funktioniert's",
+        "heading": "In drei Schritten zum perfekten Ergebnis.",
+        "background": "base",
+        "padding_top": 96,
+        "padding_bottom": 96
+      }
+    },
+    "before-after": {
+      "type": "before-after",
+      "blocks": {
+        "pair-1": {
+          "type": "pair",
+          "settings": {
+            "alt_before": "Verkratzter Lack vor der Politur",
+            "alt_after": "Spiegelglatter Lack nach der Politur",
+            "caption": "Mehrstufige Politur & Keramikversiegelung – BMW 3er"
+          }
+        },
+        "pair-2": {
+          "type": "pair",
+          "settings": {
+            "alt_before": "Stark verschmutzter Innenraum vor der Reinigung",
+            "alt_after": "Innenraum nach der Tiefenreinigung",
+            "caption": "Innenreinigung Komplett – Familien-SUV"
+          }
+        }
+      },
+      "block_order": ["pair-1", "pair-2"],
+      "settings": {
+        "eyebrow": "Vorher / Nachher",
+        "heading": "Ergebnisse, die für sich sprechen.",
+        "text": "Zieh den Regler und sieh selbst: Jedes Fahrzeug verlässt uns in einem Zustand, der überzeugt.",
+        "ratio": "4 / 3",
+        "cta_label": "Zur Galerie",
+        "cta_url": "/pages/galerie",
+        "background": "surface",
+        "padding_top": 96,
+        "padding_bottom": 96
+      }
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "blocks": {
+        "quote-1": {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "quote": "Mein Auto sieht besser aus als bei der Abholung vom Händler. Absolute Empfehlung!",
+            "author": "Markus H.",
+            "vehicle": "BMW 530d · Politur & Keramik"
+          }
+        },
+        "quote-2": {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "quote": "Hund, Kinder, Skiausrüstung – unser Innenraum war eine Katastrophe. Jetzt riecht und glänzt alles wie neu.",
+            "author": "Verena S.",
+            "vehicle": "VW Tiguan · Innenreinigung"
+          }
+        },
+        "quote-3": {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "quote": "Die Keramikversiegelung wurde top erklärt und perfekt umgesetzt. Das Wasser perlt einfach ab – Wahnsinn.",
+            "author": "Stefan K.",
+            "vehicle": "Audi RS4 · Keramik Pro"
+          }
+        }
+      },
+      "block_order": ["quote-1", "quote-2", "quote-3"],
+      "settings": {
+        "eyebrow": "Kundenstimmen",
+        "heading": "Was unsere Kunden sagen.",
+        "more_label": "Alle Bewertungen auf Google ansehen",
+        "background": "base",
+        "padding_top": 96,
+        "padding_bottom": 96
+      }
+    },
+    "cta": {
+      "type": "cta-banner",
+      "settings": {
+        "heading": "Bereit für das beste Ergebnis?",
+        "text": "Sichere dir jetzt deinen Wunschtermin – wir kümmern uns um den Rest. Unverbindliche Anfrage, Antwort innerhalb von 24 Stunden.",
+        "cta_label": "Jetzt Termin buchen",
+        "cta_url": "/pages/buchung",
+        "show_phone": true,
+        "align": "start",
+        "padding_top": 48,
+        "padding_bottom": 96
+      }
+    }
+  },
+  "order": ["hero", "trust", "services", "process", "before-after", "testimonials", "cta"]
+}

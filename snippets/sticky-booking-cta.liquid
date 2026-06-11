@@ -1,0 +1,16 @@
+{%- comment -%}
+  snippets/sticky-booking-cta.liquid — Globaler Buchungs-Button.
+  Mobil als Sticky-Bar am unteren Rand immer sichtbar (Anforderung),
+  ab Desktop übernimmt der CTA im Header. Auf der Buchungsseite selbst
+  ausgeblendet (dort ist das Formular der CTA).
+{%- endcomment -%}
+{%- if settings.booking_show_sticky and settings.booking_url != blank -%}
+  {%- unless template.suffix == 'buchung' -%}
+    <div class="sticky-cta">
+      <a class="btn btn--primary btn--block" href="{{ settings.booking_url }}">
+        {%- render 'icon', name: 'calendar', size: 20 -%}
+        <span>{{ settings.booking_label | default: 'Termin buchen' }}</span>
+      </a>
+    </div>
+  {%- endunless -%}
+{%- endif -%}

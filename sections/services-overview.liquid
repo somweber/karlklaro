@@ -1,0 +1,180 @@
+{%- comment -%}
+  sections/services-overview.liquid — Leistungs-Highlights als Karten
+  (Startseite). Karten verlinken auf Anker der Leistungsseite.
+{%- endcomment -%}
+
+<section class="section section--{{ section.settings.background }}"
+  style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+  <div class="page-width">
+    <header class="section-head" data-reveal>
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      <h2>{{ section.settings.heading }}</h2>
+      {%- if section.settings.text != blank -%}
+        <p class="section-head__lead">{{ section.settings.text }}</p>
+      {%- endif -%}
+    </header>
+
+    <div class="grid" style="--cols: {{ section.settings.columns }}; --cols-md: 2;">
+      {%- for block in section.blocks -%}
+        {%- assign delay = forloop.index0 | times: 0.08 -%}
+        {% render 'service-card',
+          icon: block.settings.icon,
+          title: block.settings.title,
+          text: block.settings.text,
+          url: block.settings.url,
+          link_label: block.settings.link_label,
+          attrs: block.shopify_attributes,
+          reveal_delay: delay
+        %}
+      {%- endfor -%}
+    </div>
+
+    {%- if section.settings.cta_label != blank and section.settings.cta_url != blank -%}
+      <div class="testimonials__more">
+        {% render 'button', label: section.settings.cta_label, url: section.settings.cta_url, style: 'outline' %}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Leistungs-Übersicht",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Overline",
+      "default": "Unsere Leistungen"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Überschrift",
+      "default": "Pflege, die man sieht."
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Einleitung",
+      "default": "Vom gründlichen Frühjahrsputz bis zur mehrjährigen Keramikversiegelung – jede Behandlung in Handarbeit, mit professionellen Produkten."
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Spalten (Desktop)",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button unten: Text",
+      "default": "Alle Leistungen ansehen"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Button unten: Ziel",
+      "default": "/pages/leistungen"
+    },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Hintergrund",
+      "options": [
+        { "value": "base", "label": "Standard (dunkel)" },
+        { "value": "surface", "label": "Anthrazit" },
+        { "value": "navy", "label": "Navy" }
+      ],
+      "default": "base"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Abstand oben",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Abstand unten",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 96
+    }
+  ],
+  "blocks": [
+    {
+      "type": "service",
+      "name": "Leistung",
+      "limit": 8,
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "none", "label": "Kein Icon" },
+            { "value": "droplet", "label": "Wassertropfen" },
+            { "value": "seat", "label": "Sitz / Innenraum" },
+            { "value": "sparkles", "label": "Glanz" },
+            { "value": "shield", "label": "Schutzschild" },
+            { "value": "beam", "label": "Scheinwerfer" },
+            { "value": "car", "label": "Auto" },
+            { "value": "gem", "label": "Edelstein" },
+            { "value": "heart", "label": "Herz" }
+          ],
+          "default": "sparkles"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Titel",
+          "default": "Außenreinigung"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Beschreibung",
+          "default": "Schonende Handwäsche, Felgenpflege und Lackreinigung – gründlicher, als es jede Waschanlage kann."
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link-Ziel",
+          "default": "/pages/leistungen"
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Link-Text",
+          "default": "Mehr erfahren"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Leistungs-Übersicht",
+      "category": "KlaroClean",
+      "blocks": [
+        { "type": "service" },
+        { "type": "service", "settings": { "icon": "seat", "title": "Innenreinigung", "text": "Tiefenreinigung für Sitze, Teppiche und alle Oberflächen. Dein Innenraum – frisch wie am ersten Tag." } },
+        { "type": "service", "settings": { "icon": "sparkles", "title": "Politur & Lackpflege", "text": "Mehrstufige Politur entfernt Kratzer, Hologramme und Mattigkeit – für ein spiegelglattes Finish." } },
+        { "type": "service", "settings": { "icon": "shield", "title": "Keramikversiegelung", "text": "Langzeitschutz mit extremem Glanz und Abperleffekt – die Königsklasse der Lackpflege." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,37 @@
+{%- comment -%}
+  sections/main-article.liquid — Einzelner Blog-Artikel.
+{%- endcomment -%}
+
+<article class="section" style="--pt: 72px; --pb: 96px;">
+  <div class="page-width page-width--narrow">
+    <header class="section-head">
+      <p class="eyebrow">{{ article.published_at | date: '%d.%m.%Y' }}</p>
+      <h1>{{ article.title }}</h1>
+    </header>
+
+    {%- if article.image -%}
+      {% render 'responsive-image',
+        image: article.image,
+        alt: article.title,
+        sizes: '(min-width: 990px) 820px, 100vw',
+        aspect: '16 / 9'
+      %}
+    {%- endif -%}
+
+    <div class="rte" style="margin-top: var(--space-xl);">
+      {{ article.content }}
+    </div>
+
+    <div style="margin-top: var(--space-2xl);">
+      {%- assign back_label = 'blog.back' | t -%}
+      {% render 'button', label: back_label, url: blog.url, style: 'outline' %}
+    </div>
+  </div>
+</article>
+
+{% schema %}
+{
+  "name": "Blog-Artikel",
+  "settings": []
+}
+{% endschema %}

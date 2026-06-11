@@ -1,0 +1,22 @@
+{%- comment -%}
+  snippets/button.liquid — Einheitlicher Button/Link.
+  Parameter:
+    label  (String, Pflicht)   url   (String, Pflicht)
+    style  ('primary' | 'outline' | 'ghost', Default: 'primary')
+    size   ('sm' | 'lg', optional)
+    icon   (Icon-Name, optional — wird rechts angezeigt)
+    external (Boolean — öffnet in neuem Tab)
+{%- endcomment -%}
+{%- liquid
+  assign btn_style = style | default: 'primary'
+  assign classes = 'btn btn--' | append: btn_style
+  if size
+    assign classes = classes | append: ' btn--' | append: size
+  endif
+-%}
+{%- if label != blank and url != blank -%}
+  <a class="{{ classes }}" href="{{ url }}"{% if external %} target="_blank" rel="noopener"{% endif %}>
+    <span>{{ label }}</span>
+    {%- if icon -%}{% render 'icon', name: icon, size: 18 %}{%- endif -%}
+  </a>
+{%- endif -%}

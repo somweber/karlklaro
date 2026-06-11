@@ -1,0 +1,183 @@
+{%- comment -%}
+  sections/before-after.liquid — Vorher/Nachher-Galerie als Carousel.
+  Jeder Block = ein Bildpaar im interaktiven Vergleichs-Slider
+  (snippets/compare-slider.liquid). Bei nur einem Block: volle Breite, keine Pfeile.
+{%- endcomment -%}
+
+<section class="section section--{{ section.settings.background }}"
+  style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+  <div class="page-width">
+    <header class="section-head" data-reveal>
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      <h2>{{ section.settings.heading }}</h2>
+      {%- if section.settings.text != blank -%}
+        <p class="section-head__lead">{{ section.settings.text }}</p>
+      {%- endif -%}
+    </header>
+
+    <div class="carousel" data-carousel>
+      <div class="carousel__track{% if section.blocks.size == 1 %} carousel__track--single{% endif %}" data-carousel-track>
+        {%- for block in section.blocks -%}
+          <figure class="compare-figure" data-reveal {{ block.shopify_attributes }}>
+            {% render 'compare-slider',
+              image_before: block.settings.image_before,
+              image_after: block.settings.image_after,
+              alt_before: block.settings.alt_before,
+              alt_after: block.settings.alt_after,
+              aspect: section.settings.ratio
+            %}
+            {%- if block.settings.caption != blank -%}
+              <figcaption>{{ block.settings.caption | escape }}</figcaption>
+            {%- endif -%}
+          </figure>
+        {%- endfor -%}
+      </div>
+
+      {%- if section.blocks.size > 1 -%}
+        <div class="carousel__nav">
+          <button class="carousel__btn" type="button" data-carousel-prev aria-label="{{ 'general.previous' | t }}">
+            {%- render 'icon', name: 'chevron-left', size: 20 -%}
+          </button>
+          <button class="carousel__btn" type="button" data-carousel-next aria-label="{{ 'general.next' | t }}">
+            {%- render 'icon', name: 'chevron-right', size: 20 -%}
+          </button>
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.cta_label != blank and section.settings.cta_url != blank -%}
+      <div class="testimonials__more">
+        {% render 'button', label: section.settings.cta_label, url: section.settings.cta_url, style: 'ghost', icon: 'arrow-right' %}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Vorher / Nachher",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Overline",
+      "default": "Vorher / Nachher"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Überschrift",
+      "default": "Ergebnisse, die für sich sprechen."
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Einleitung",
+      "default": "Zieh den Regler und sieh selbst: Jedes Fahrzeug verlässt uns in einem Zustand, der überzeugt."
+    },
+    {
+      "type": "select",
+      "id": "ratio",
+      "label": "Bildformat",
+      "options": [
+        { "value": "4 / 3", "label": "4:3" },
+        { "value": "16 / 9", "label": "16:9" },
+        { "value": "1 / 1", "label": "Quadratisch" }
+      ],
+      "default": "4 / 3"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Link unten: Text",
+      "default": "Zur Galerie"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Link unten: Ziel",
+      "default": "/pages/galerie"
+    },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Hintergrund",
+      "options": [
+        { "value": "base", "label": "Standard (dunkel)" },
+        { "value": "surface", "label": "Anthrazit" },
+        { "value": "navy", "label": "Navy" }
+      ],
+      "default": "surface"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Abstand oben",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Abstand unten",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 96
+    }
+  ],
+  "blocks": [
+    {
+      "type": "pair",
+      "name": "Bildpaar",
+      "limit": 8,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image_before",
+          "label": "Bild „Vorher“"
+        },
+        {
+          "type": "text",
+          "id": "alt_before",
+          "label": "Alt-Text „Vorher“",
+          "default": "Fahrzeug vor der Aufbereitung"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_after",
+          "label": "Bild „Nachher“"
+        },
+        {
+          "type": "text",
+          "id": "alt_after",
+          "label": "Alt-Text „Nachher“",
+          "default": "Fahrzeug nach der Aufbereitung"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Bildunterschrift",
+          "default": "Lackpolitur & Versiegelung"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vorher / Nachher",
+      "category": "KlaroClean",
+      "blocks": [
+        { "type": "pair" },
+        { "type": "pair", "settings": { "caption": "Innenreinigung komplett" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

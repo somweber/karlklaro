@@ -1,0 +1,40 @@
+{%- comment -%}
+  snippets/responsive-image.liquid — Performantes Bild mit srcset + Lazy Loading.
+  Parameter:
+    image       (image-Objekt; leer → gebrandeter SVG-Platzhalter)
+    alt         (String; Fallback: Alt-Text aus Shopify-Mediathek)
+    sizes       (sizes-Attribut, Default '100vw')
+    loading     ('lazy' | 'eager', Default 'lazy' — Hero nutzt eager)
+    aspect      (CSS aspect-ratio, z. B. '4 / 3', optional)
+    class       (Zusatzklasse am Wrapper, optional)
+    placeholder (Name des Shopify-Platzhalter-SVGs, Default 'image')
+{%- endcomment -%}
+{%- liquid
+  assign img_loading = loading | default: 'lazy'
+  assign img_sizes = sizes | default: '100vw'
+  assign ph = placeholder | default: 'image'
+  # image_tag escaped Attribut-Werte selbst — kein zusätzliches escape (Doppel-Escaping)
+  assign alt_text = alt | default: image.alt
+-%}
+<div class="media {{ class }}"{% if aspect %} style="--aspect: {{ aspect }};"{% endif %}>
+  {%- if image != blank -%}
+    {%- if img_loading == 'eager' -%}
+      {{ image | image_url: width: 2000 | image_tag:
+        widths: '400, 600, 800, 1000, 1400, 1800, 2000',
+        sizes: img_sizes,
+        loading: 'eager',
+        fetchpriority: 'high',
+        alt: alt_text
+      }}
+    {%- else -%}
+      {{ image | image_url: width: 2000 | image_tag:
+        widths: '400, 600, 800, 1000, 1400, 1800, 2000',
+        sizes: img_sizes,
+        loading: 'lazy',
+        alt: alt_text
+      }}
+    {%- endif -%}
+  {%- else -%}
+    {{ ph | placeholder_svg_tag: 'media__placeholder' }}
+  {%- endif -%}
+</div>

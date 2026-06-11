@@ -1,0 +1,92 @@
+{
+  "sections": {
+    "hero": {
+      "type": "page-hero",
+      "settings": {
+        "eyebrow": "Über uns",
+        "heading": "Drei Freunde. Eine Mission.",
+        "text": "KlaroClean steht für Fahrzeugpflege auf höchstem Niveau – gegründet in Innsbruck, verwurzelt in Tirol, angetrieben von echter Leidenschaft fürs Detail."
+      }
+    },
+    "story": {
+      "type": "image-with-text",
+      "blocks": {
+        "fact-1": {
+          "type": "fact",
+          "settings": { "value": "3", "label": "Gründer" }
+        },
+        "fact-2": {
+          "type": "fact",
+          "settings": { "value": "200+", "label": "Fahrzeuge" }
+        },
+        "fact-3": {
+          "type": "fact",
+          "settings": { "value": "100 %", "label": "Handarbeit" }
+        }
+      },
+      "block_order": ["fact-1", "fact-2", "fact-3"],
+      "settings": {
+        "layout": "left",
+        "image_alt": "Das KlaroClean-Team bei der Arbeit in der Werkstatt",
+        "eyebrow": "Unsere Geschichte",
+        "heading": "Aus Leidenschaft wurde Präzision.",
+        "text": "<p>KlaroClean wurde von drei Freunden aus Innsbruck gegründet, die eines verbindet: die Überzeugung, dass Autopflege Handwerk ist. Was in einer Garage mit Poliermaschine und viel Geduld begann, ist heute ein professioneller Detailing-Betrieb für ganz Tirol.</p><p>Wir arbeiten ausschließlich mit Produkten, die wir selbst getestet haben – und geben kein Fahrzeug aus der Hand, bevor es unserem eigenen Anspruch genügt.</p>",
+        "background": "base",
+        "padding_top": 96,
+        "padding_bottom": 96
+      }
+    },
+    "team": {
+      "type": "team-grid",
+      "blocks": {
+        "member-1": {
+          "type": "member",
+          "settings": {
+            "name": "Elias",
+            "role": "Gründer · Lack & Politur",
+            "bio": "Perfektionist an der Poliermaschine – gibt den Lack erst frei, wenn er unter Halogenlicht besteht."
+          }
+        },
+        "member-2": {
+          "type": "member",
+          "settings": {
+            "name": "Samuel",
+            "role": "Gründer · Interieur",
+            "bio": "Kennt jede Ritze im Innenraum – und hat für jeden Fleck die passende Antwort."
+          }
+        },
+        "member-3": {
+          "type": "member",
+          "settings": {
+            "name": "Jakob",
+            "role": "Gründer · Keramik & Versiegelung",
+            "bio": "Zertifizierter Keramik-Spezialist. Sorgt dafür, dass der Glanz nicht nur heute hält."
+          }
+        }
+      },
+      "block_order": ["member-1", "member-2", "member-3"],
+      "settings": {
+        "eyebrow": "Das Team",
+        "heading": "Drei Gründer. Ein Anspruch.",
+        "text": "Hinweis: Namen und Fotos sind Platzhalter – im Theme-Editor austauschen.",
+        "background": "surface",
+        "padding_top": 96,
+        "padding_bottom": 96
+      }
+    },
+    "mission": {
+      "type": "cta-banner",
+      "settings": {
+        "heading": "Unsere Mission: Jedes Auto verlässt uns so, wie wir unser eigenes übernehmen würden.",
+        "text": "Lokal, ehrlich, kompromisslos bei der Qualität. Komm vorbei und überzeug dich selbst.",
+        "cta_label": "Lern uns persönlich kennen",
+        "cta_url": "/pages/kontakt",
+        "show_phone": false,
+        "align": "center",
+        "padding_top": 96,
+        "padding_bottom": 96
+      }
+    }
+  },
+  "order": ["hero", "story", "team", "mission"]
+}

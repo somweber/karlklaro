@@ -1,0 +1,240 @@
+{%- comment -%}
+  sections/services-list.liquid — Komplette Leistungsliste (Seite „Leistungen“).
+
+  Block-Muster: „Kategorie“-Blöcke eröffnen eine neue Gruppe (mit Anker für
+  Sprung-Navigation), alle folgenden „Leistung“-Blöcke gehören zur zuletzt
+  geöffneten Kategorie. So bleibt die gesamte Struktur im Theme-Editor frei
+  sortier- und erweiterbar — keine Leistung ist im Code hinterlegt.
+{%- endcomment -%}
+
+{%- liquid
+  # Kategorien einsammeln (für die Anker-Pills oben)
+  assign cat_list = ''
+  for block in section.blocks
+    if block.type == 'category'
+      assign anchor = block.settings.anchor | default: block.settings.title | handleize
+      assign cat_list = cat_list | append: anchor | append: '::' | append: block.settings.title | append: '||'
+    endif
+  endfor
+  assign cats = cat_list | split: '||'
+-%}
+
+<section class="section"
+  style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+  <div class="page-width">
+
+    {%- if section.settings.show_anchor_nav and cats.size > 1 -%}
+      <nav class="anchor-nav" aria-label="Leistungs-Kategorien">
+        {%- for cat in cats -%}
+          {%- assign parts = cat | split: '::' -%}
+          <a class="anchor-nav__link" href="#{{ parts[0] }}">{{ parts[1] }}</a>
+        {%- endfor -%}
+      </nav>
+    {%- endif -%}
+
+    {%- assign group_open = false -%}
+    {%- for block in section.blocks -%}
+      {%- case block.type -%}
+
+        {%- when 'category' -%}
+          {%- if group_open -%}
+            </div></div>
+          {%- endif -%}
+          {%- assign anchor = block.settings.anchor | default: block.settings.title | handleize -%}
+          <div class="services-group" id="{{ anchor }}" {{ block.shopify_attributes }}>
+            <header class="services-group__head" data-reveal>
+              {%- if block.settings.icon != 'none' -%}
+                <span class="icon-badge">{% render 'icon', name: block.settings.icon, size: 26 %}</span>
+              {%- endif -%}
+              <h2>{{ block.settings.title | escape }}</h2>
+            </header>
+            <div class="services-group__grid">
+          {%- assign group_open = true -%}
+
+        {%- when 'service' -%}
+          {%- comment -%} Leistung ohne vorangehende Kategorie: Gruppe ohne Titel öffnen {%- endcomment -%}
+          {%- unless group_open -%}
+            <div class="services-group"><div class="services-group__grid">
+            {%- assign group_open = true -%}
+          {%- endunless -%}
+
+          <article class="service-item" data-reveal {{ block.shopify_attributes }}>
+            <div class="service-item__head">
+              <h3>{{ block.settings.title | escape }}</h3>
+              {%- if block.settings.price != blank -%}
+                <span class="service-item__price">{{ block.settings.price | escape }}</span>
+              {%- endif -%}
+            </div>
+
+            {%- if block.settings.duration != blank -%}
+              <span class="service-item__meta">
+                {%- render 'icon', name: 'clock', size: 16 -%}
+                {{ block.settings.duration | escape }}
+              </span>
+            {%- endif -%}
+
+            {%- if block.settings.text != blank -%}
+              <p class="service-item__text">{{ block.settings.text }}</p>
+            {%- endif -%}
+
+            {%- if block.settings.features != blank -%}
+              {%- assign features = block.settings.features | newline_to_br | split: '<br />' -%}
+              <ul class="service-item__features">
+                {%- for feature in features -%}
+                  {%- assign f = feature | strip -%}
+                  {%- if f != blank -%}
+                    <li>{% render 'icon', name: 'check', size: 17 %}<span>{{ f }}</span></li>
+                  {%- endif -%}
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+
+            {%- if block.settings.cta_label != blank -%}
+              {%- assign cta_url = block.settings.cta_url | default: settings.booking_url -%}
+              <div class="service-item__cta">
+                {% render 'button', label: block.settings.cta_label, url: cta_url, style: 'outline', size: 'sm' %}
+              </div>
+            {%- endif -%}
+          </article>
+
+      {%- endcase -%}
+    {%- endfor -%}
+    {%- if group_open -%}
+      </div></div>
+    {%- endif -%}
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Leistungsliste",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_anchor_nav",
+      "label": "Kategorie-Sprungnavigation anzeigen",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Abstand oben",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Abstand unten",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 96
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Kategorie",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "none", "label": "Kein Icon" },
+            { "value": "droplet", "label": "Wassertropfen" },
+            { "value": "seat", "label": "Sitz / Innenraum" },
+            { "value": "sparkles", "label": "Glanz" },
+            { "value": "shield", "label": "Schutzschild" },
+            { "value": "beam", "label": "Scheinwerfer" },
+            { "value": "car", "label": "Auto" },
+            { "value": "gem", "label": "Edelstein" },
+            { "value": "heart", "label": "Herz" }
+          ],
+          "default": "droplet"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Kategorie-Titel",
+          "default": "Außenreinigung"
+        },
+        {
+          "type": "text",
+          "id": "anchor",
+          "label": "Anker (für Sprunglinks)",
+          "info": "Nur Kleinbuchstaben ohne Umlaute, z. B. „aussenreinigung“. Leer = automatisch aus dem Titel.",
+          "default": "aussenreinigung"
+        }
+      ]
+    },
+    {
+      "type": "service",
+      "name": "Leistung",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Name",
+          "default": "Handwäsche Exterieur"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Preis (Text)",
+          "info": "z. B. „ab € 59“ oder „auf Anfrage“",
+          "default": "ab € 59"
+        },
+        {
+          "type": "text",
+          "id": "duration",
+          "label": "Dauer",
+          "default": "ca. 1,5 Std."
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Beschreibung",
+          "default": "Schonende Zwei-Eimer-Handwäsche mit pH-neutralem Shampoo – sicher für jeden Lack."
+        },
+        {
+          "type": "textarea",
+          "id": "features",
+          "label": "Inklusivleistungen (eine pro Zeile)",
+          "default": "Felgen- & Reifenpflege\nInsekten- & Teerentfernung\nTrocknung mit Premium-Mikrofaser"
+        },
+        {
+          "type": "text",
+          "id": "cta_label",
+          "label": "Button-Text",
+          "default": "Termin anfragen"
+        },
+        {
+          "type": "url",
+          "id": "cta_url",
+          "label": "Button-Ziel",
+          "info": "Leer lassen, um die globale Buchungs-URL zu verwenden."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Leistungsliste",
+      "category": "KlaroClean",
+      "blocks": [
+        { "type": "category" },
+        { "type": "service" },
+        { "type": "category", "settings": { "icon": "seat", "title": "Innenreinigung", "anchor": "innenreinigung" } },
+        { "type": "service", "settings": { "title": "Innenreinigung Komplett", "price": "ab € 89", "duration": "ca. 2–3 Std.", "text": "Tiefenreinigung des gesamten Innenraums – inklusive aller Ritzen und Zwischenräume.", "features": "Sitze & Teppiche tiefengereinigt\nKunststoffpflege\nScheiben innen streifenfrei" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,94 @@
+{%- comment -%}
+  sections/main-product.liquid — Produktseite (z. B. Gutscheine,
+  Pflegeprodukte). Bewusst schlank: Variante als natives <select>
+  (name="id") → funktioniert vollständig ohne JavaScript.
+{%- endcomment -%}
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+
+<section class="section" style="--pt: 48px; --pb: 96px;">
+  <div class="page-width product-layout">
+
+    <div class="product-gallery">
+      {%- if product.media.size > 0 -%}
+        {%- for media in product.media -%}
+          {%- if media.media_type == 'image' -%}
+            {%- liquid
+              assign load_mode = 'lazy'
+              if forloop.first
+                assign load_mode = 'eager'
+              endif
+            -%}
+            {% render 'responsive-image',
+              image: media.preview_image,
+              alt: media.alt,
+              sizes: '(min-width: 990px) 720px, 100vw',
+              aspect: '1',
+              loading: load_mode
+            %}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- else -%}
+        {% render 'responsive-image', placeholder: 'product-apparel-1', aspect: '1' %}
+      {%- endif -%}
+    </div>
+
+    <div class="product-info">
+      <h1>{{ product.title }}</h1>
+
+      <p class="price">
+        {{ current_variant.price | money }}
+        {%- if current_variant.compare_at_price > current_variant.price -%}
+          <s class="price--compare">{{ current_variant.compare_at_price | money }}</s>
+        {%- endif -%}
+      </p>
+
+      {%- form 'product', product -%}
+        {%- unless product.has_only_default_variant -%}
+          <div class="field">
+            <label class="field__label" for="VariantSelect-{{ section.id }}">{{ 'products.variant' | t }}</label>
+            <select class="field__input" id="VariantSelect-{{ section.id }}" name="id">
+              {%- for variant in product.variants -%}
+                <option value="{{ variant.id }}"
+                  {% if variant.id == current_variant.id %}selected{% endif %}
+                  {% unless variant.available %}disabled{% endunless %}>
+                  {{ variant.title }} – {{ variant.price | money }}
+                  {%- unless variant.available %} ({{ 'products.sold_out' | t }}){% endunless %}
+                </option>
+              {%- endfor -%}
+            </select>
+          </div>
+        {%- else -%}
+          <input type="hidden" name="id" value="{{ current_variant.id }}">
+        {%- endunless -%}
+
+        <div class="field">
+          <label class="field__label" for="Quantity-{{ section.id }}">{{ 'products.quantity' | t }}</label>
+          <input class="field__input qty-input" type="number" id="Quantity-{{ section.id }}"
+            name="quantity" value="1" min="1">
+        </div>
+
+        <button class="btn btn--primary btn--lg btn--block" type="submit"
+          {% unless product.available %}disabled{% endunless %}>
+          {%- if product.available -%}
+            {{ 'products.add_to_cart' | t }}
+          {%- else -%}
+            {{ 'products.sold_out' | t }}
+          {%- endif -%}
+        </button>
+      {%- endform -%}
+
+      {%- if product.description != blank -%}
+        <div class="rte">{{ product.description }}</div>
+      {%- endif -%}
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Produktseite",
+  "settings": []
+}
+{% endschema %}

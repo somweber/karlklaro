@@ -1,0 +1,13 @@
+{%- comment -%}
+  snippets/rating-stars.liquid — 5-Sterne-Anzeige.
+  Parameter: rating (1–5, Default 5)
+  role="img" + aria-label machen die Bewertung für Screenreader lesbar.
+{%- endcomment -%}
+{%- assign rating_value = rating | default: 5 | times: 1 -%}
+<div class="stars" role="img" aria-label="Bewertung: {{ rating_value }} von 5 Sternen">
+  {%- for i in (1..5) -%}
+    <span class="star{% if i > rating_value %} star--empty{% endif %}">
+      {%- render 'icon', name: 'star', size: 16 -%}
+    </span>
+  {%- endfor -%}
+</div>

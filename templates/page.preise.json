@@ -1,0 +1,80 @@
+{
+  "sections": {
+    "hero": {
+      "type": "page-hero",
+      "settings": {
+        "eyebrow": "Preise",
+        "heading": "Faire Preise. Ehrliche Arbeit.",
+        "text": "Transparente Pakete für jede Anforderung. Der Endpreis hängt von Fahrzeuggröße und Zustand ab – nach einer kurzen Besichtigung ist er fix und verbindlich."
+      }
+    },
+    "pricing": {
+      "type": "pricing-table",
+      "blocks": {
+        "tier-basic": {
+          "type": "tier",
+          "settings": {
+            "title": "Basic Pflege",
+            "tagline": "Der schnelle Frischekick",
+            "price": "ab € 89",
+            "price_note": "pro Fahrzeug, inkl. USt.",
+            "features": "Außenwäsche per Hand\nInnenraum saugen & wischen\nScheiben innen & außen\nKunststoffpflege innen\nDauer: ca. 2 Stunden",
+            "featured": false,
+            "cta_label": "Basic anfragen"
+          }
+        },
+        "tier-premium": {
+          "type": "tier",
+          "settings": {
+            "title": "Premium Detail",
+            "tagline": "Gründlichkeit + Glanz",
+            "price": "ab € 249",
+            "price_note": "pro Fahrzeug, inkl. USt.",
+            "features": "Alles aus Basic Pflege\nInnenreinigung komplett\nEinstufige Maschinenpolitur\nLack- & Felgenversiegelung\nDauer: ca. 1 Tag",
+            "featured": true,
+            "badge": "Beliebteste Wahl",
+            "cta_label": "Premium anfragen"
+          }
+        },
+        "tier-full": {
+          "type": "tier",
+          "settings": {
+            "title": "Full Detail",
+            "tagline": "Das Komplettprogramm",
+            "price": "ab € 489",
+            "price_note": "pro Fahrzeug, inkl. USt.",
+            "features": "Alles aus Premium Detail\nMehrstufige Politur\nKeramikversiegelung Basis\nMotorraum- & Türfalzenreinigung\nDauer: 1–2 Tage",
+            "featured": false,
+            "cta_label": "Full Detail anfragen"
+          }
+        }
+      },
+      "block_order": ["tier-basic", "tier-premium", "tier-full"],
+      "settings": {
+        "eyebrow": "Pakete",
+        "heading": "Drei Pakete. Ein Anspruch.",
+        "text": "Wähle das Paket, das zu deinem Fahrzeug passt – oder hol dir ein individuelles Angebot.",
+        "custom_label": "Individuelles Angebot anfragen",
+        "custom_url": "/pages/kontakt",
+        "note": "Alle Preise inkl. 20 % USt. Richtpreise für PKW der Kompaktklasse – SUV, Van und stark verschmutzte Fahrzeuge gegen Aufpreis.",
+        "background": "base",
+        "padding_top": 72,
+        "padding_bottom": 96
+      }
+    },
+    "cta": {
+      "type": "cta-banner",
+      "settings": {
+        "heading": "Nicht sicher, welches Paket passt?",
+        "text": "Schick uns ein paar Fotos von deinem Auto – wir sagen dir ehrlich, was es braucht. Und was nicht.",
+        "cta_label": "Beratung anfragen",
+        "cta_url": "/pages/kontakt",
+        "show_phone": true,
+        "align": "start",
+        "padding_top": 0,
+        "padding_bottom": 96
+      }
+    }
+  },
+  "order": ["hero", "pricing", "cta"]
+}

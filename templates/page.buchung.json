@@ -1,0 +1,22 @@
+{
+  "sections": {
+    "hero": {
+      "type": "page-hero",
+      "settings": {
+        "eyebrow": "Terminbuchung",
+        "heading": "Buch deinen Wunschtermin.",
+        "text": "Drei kurze Schritte – wir bestätigen deinen Termin innerhalb von 24 Stunden.",
+        "compact": true
+      }
+    },
+    "booking": {
+      "type": "booking-form",
+      "settings": {
+        "show_form": true,
+        "padding_top": 72,
+        "padding_bottom": 96
+      }
+    }
+  },
+  "order": ["hero", "booking"]
+}

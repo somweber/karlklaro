@@ -1,0 +1,221 @@
+{%- comment -%}
+  sections/contact.liquid — Kontaktformular + Kontaktdaten + Google-Maps-Embed.
+  Formular nutzt Shopifys natives Kontaktformular (E-Mail an den Shop).
+  Kontaktdaten kommen zentral aus den Theme-Einstellungen.
+{%- endcomment -%}
+
+<section class="section"
+  style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+  <div class="page-width">
+    <div class="contact-layout">
+
+      <div class="booking-card">
+        <h2>{{ section.settings.form_heading }}</h2>
+
+        {%- form 'contact', id: 'ContactForm' -%}
+          {%- if form.posted_successfully? -%}
+            <div class="form-success" data-form-success role="status" style="margin-top: var(--space-lg);">
+              <span class="icon-badge">{% render 'icon', name: 'check', size: 30 %}</span>
+              <h3>{{ section.settings.success_heading }}</h3>
+              <p class="text-muted">{{ section.settings.success_text }}</p>
+            </div>
+          {%- else -%}
+            {%- if form.errors -%}
+              <div class="form-error" role="alert" style="margin-top: var(--space-lg);">
+                Deine Nachricht konnte nicht gesendet werden. Bitte überprüfe die E-Mail-Adresse und versuche es erneut.
+              </div>
+            {%- endif -%}
+
+            <div class="form-grid" style="margin-top: var(--space-lg);">
+              <div class="field">
+                <label class="field__label" for="ContactName">Name <span class="req" aria-hidden="true">*</span></label>
+                <input class="field__input" type="text" id="ContactName" name="contact[name]" autocomplete="name" required
+                  value="{% if form.name %}{{ form.name }}{% endif %}">
+              </div>
+              <div class="field">
+                <label class="field__label" for="ContactEmail">E-Mail <span class="req" aria-hidden="true">*</span></label>
+                <input class="field__input" type="email" id="ContactEmail" name="contact[email]" autocomplete="email" required
+                  value="{% if form.email %}{{ form.email }}{% endif %}"
+                  aria-invalid="{% if form.errors contains 'email' %}true{% else %}false{% endif %}">
+              </div>
+              <div class="field field--full">
+                <label class="field__label" for="ContactMessage">Nachricht <span class="req" aria-hidden="true">*</span></label>
+                <textarea class="field__input" id="ContactMessage" name="contact[body]" required
+                  placeholder="{{ section.settings.message_placeholder | escape }}"></textarea>
+              </div>
+              <div class="field field--full">
+                <button class="btn btn--primary" type="submit">
+                  <span>{{ section.settings.submit_label }}</span>
+                  {%- render 'icon', name: 'send', size: 18 -%}
+                </button>
+              </div>
+            </div>
+          {%- endif -%}
+        {%- endform -%}
+      </div>
+
+      <div class="info-card">
+        <h2 style="font-size: 1.2rem;">{{ section.settings.info_heading }}</h2>
+
+        {%- if settings.contact_phone != blank -%}
+          <div class="info-card__row">
+            <span class="icon-badge">{% render 'icon', name: 'phone', size: 20 %}</span>
+            <div>
+              <p class="info-card__label">Telefon</p>
+              <p class="info-card__value"><a href="tel:{{ settings.contact_phone | replace: ' ', '' }}">{{ settings.contact_phone }}</a></p>
+            </div>
+          </div>
+        {%- endif -%}
+
+        {%- if settings.contact_email != blank -%}
+          <div class="info-card__row">
+            <span class="icon-badge">{% render 'icon', name: 'mail', size: 20 %}</span>
+            <div>
+              <p class="info-card__label">E-Mail</p>
+              <p class="info-card__value"><a href="mailto:{{ settings.contact_email }}">{{ settings.contact_email }}</a></p>
+            </div>
+          </div>
+        {%- endif -%}
+
+        {%- if settings.contact_address != blank -%}
+          <div class="info-card__row">
+            <span class="icon-badge">{% render 'icon', name: 'map-pin', size: 20 %}</span>
+            <div>
+              <p class="info-card__label">Standort</p>
+              <p class="info-card__value">{{ settings.contact_address }}</p>
+            </div>
+          </div>
+        {%- endif -%}
+
+        {%- if settings.contact_hours != blank -%}
+          <div class="info-card__row">
+            <span class="icon-badge">{% render 'icon', name: 'clock', size: 20 %}</span>
+            <div>
+              <p class="info-card__label">Zeiten</p>
+              <p class="info-card__value">{{ settings.contact_hours }}</p>
+            </div>
+          </div>
+        {%- endif -%}
+
+        <div class="social-row">
+          {%- if settings.social_instagram != blank -%}
+            <a class="social-row__link" href="{{ settings.social_instagram }}" target="_blank" rel="noopener" aria-label="Instagram">
+              {%- render 'icon', name: 'instagram', size: 20 -%}
+            </a>
+          {%- endif -%}
+          {%- if settings.social_whatsapp != blank -%}
+            <a class="social-row__link" href="{{ settings.social_whatsapp }}" target="_blank" rel="noopener" aria-label="WhatsApp">
+              {%- render 'icon', name: 'whatsapp', size: 20 -%}
+            </a>
+          {%- endif -%}
+          {%- if settings.maps_link != blank -%}
+            <a class="social-row__link" href="{{ settings.maps_link }}" target="_blank" rel="noopener" aria-label="Google Maps">
+              {%- render 'icon', name: 'map-pin', size: 20 -%}
+            </a>
+          {%- endif -%}
+        </div>
+      </div>
+
+    </div>
+
+    {%- if section.settings.show_map and settings.maps_embed != blank -%}
+      <div class="map-frame{% unless section.settings.map_dark %} map-frame--light{% endunless %}">
+        {%- comment -%} lazy + CSS-Invertierung für den Dark-Look (siehe base.css) {%- endcomment -%}
+        <iframe
+          src="{{ settings.maps_embed }}"
+          title="Google Maps – Standort {{ shop.name }}"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          allowfullscreen></iframe>
+      </div>
+    {%- endif -%}
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Kontakt",
+  "settings": [
+    {
+      "type": "text",
+      "id": "form_heading",
+      "label": "Formular: Überschrift",
+      "default": "Schreib uns"
+    },
+    {
+      "type": "text",
+      "id": "message_placeholder",
+      "label": "Platzhalter Nachricht",
+      "default": "Wie können wir dir helfen?"
+    },
+    {
+      "type": "text",
+      "id": "submit_label",
+      "label": "Button-Text",
+      "default": "Nachricht senden"
+    },
+    {
+      "type": "text",
+      "id": "success_heading",
+      "label": "Erfolgsmeldung: Überschrift",
+      "default": "Nachricht gesendet!"
+    },
+    {
+      "type": "textarea",
+      "id": "success_text",
+      "label": "Erfolgsmeldung: Text",
+      "default": "Danke für deine Nachricht – wir melden uns so schnell wie möglich."
+    },
+    {
+      "type": "text",
+      "id": "info_heading",
+      "label": "Info-Karte: Überschrift",
+      "default": "Direkter Kontakt"
+    },
+    {
+      "type": "header",
+      "content": "Karte"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_map",
+      "label": "Google-Maps-Karte anzeigen",
+      "default": true,
+      "info": "Embed-URL unter Theme-Einstellungen → Kontaktdaten hinterlegen."
+    },
+    {
+      "type": "checkbox",
+      "id": "map_dark",
+      "label": "Karte dunkel einfärben",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Abstand oben",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Abstand unten",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 96
+    }
+  ],
+  "presets": [
+    {
+      "name": "Kontakt",
+      "category": "KlaroClean"
+    }
+  ]
+}
+{% endschema %}

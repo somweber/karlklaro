@@ -1,0 +1,323 @@
+{%- comment -%}
+  sections/booking-form.liquid — Terminanfrage in 3 Schritten.
+
+  Technik:
+  - Nutzt Shopifys Kontaktformular (form 'contact'): Anfragen landen
+    als E-Mail im Shop-Postfach — funktioniert ohne App und ohne JS.
+  - JS (main.js) verwandelt das Formular progressiv in einen 3-Schritte-Stepper.
+  - Cowlendar-Integration: Section akzeptiert App-Blöcke ("@app"). Den
+    Cowlendar-Block im Theme-Editor hinzufügen und ggf. das Formular über
+    die Einstellung „Anfrage-Formular anzeigen“ deaktivieren.
+{%- endcomment -%}
+
+{%- liquid
+  assign vehicle_options = section.settings.vehicle_options | newline_to_br | split: '<br />'
+  assign service_options = section.settings.service_options | newline_to_br | split: '<br />'
+  assign time_options = section.settings.time_options | newline_to_br | split: '<br />'
+  assign aside_steps = section.settings.aside_steps | newline_to_br | split: '<br />'
+-%}
+
+<section class="section"
+  style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+  <div class="page-width">
+    <div class="booking-layout">
+
+      <div class="booking-card">
+        {%- comment -%} App-Blöcke (z. B. Cowlendar-Kalender) erscheinen vor dem Formular {%- endcomment -%}
+        {%- for block in section.blocks -%}
+          {%- if block.type == '@app' -%}
+            <div {{ block.shopify_attributes }}>{% render block %}</div>
+          {%- endif -%}
+        {%- endfor -%}
+
+        {%- if section.settings.show_form -%}
+          {%- form 'contact', id: 'BookingForm' -%}
+
+            {%- if form.posted_successfully? -%}
+              <div class="form-success" data-form-success role="status">
+                <span class="icon-badge">{% render 'icon', name: 'check', size: 30 %}</span>
+                <h2>{{ section.settings.success_heading }}</h2>
+                <p class="text-muted">{{ section.settings.success_text }}</p>
+                {% render 'button', label: section.settings.success_cta_label, url: routes.root_url, style: 'outline' %}
+              </div>
+            {%- else -%}
+
+              {%- if form.errors -%}
+                <div class="form-error" role="alert">
+                  Deine Anfrage konnte nicht gesendet werden. Bitte überprüfe deine Angaben –
+                  insbesondere die E-Mail-Adresse – und versuche es erneut.
+                </div>
+              {%- endif -%}
+
+              {%- comment -%} Wrapper mit data-Attribut: Andockpunkt für den JS-Stepper {%- endcomment -%}
+              <div data-booking-form>
+                <ol class="booking-progress" data-booking-progress aria-hidden="true">
+                  <li class="booking-progress__item is-active">1. Kontakt</li>
+                  <li class="booking-progress__item">2. Fahrzeug & Leistung</li>
+                  <li class="booking-progress__item">3. Termin</li>
+                </ol>
+
+                {%- comment -%} Kennzeichnung der Anfrage in der E-Mail-Benachrichtigung {%- endcomment -%}
+                <input type="hidden" name="contact[Formular]" value="Terminanfrage">
+
+                <fieldset class="booking-step is-active" data-booking-step="1">
+                  <legend>Deine Kontaktdaten</legend>
+                  <div class="form-grid">
+                    <div class="field">
+                      <label class="field__label" for="BookingName">Name <span class="req" aria-hidden="true">*</span></label>
+                      <input class="field__input" type="text" id="BookingName" name="contact[name]"
+                        autocomplete="name" required
+                        value="{% if form.name %}{{ form.name }}{% endif %}">
+                    </div>
+                    <div class="field">
+                      <label class="field__label" for="BookingEmail">E-Mail <span class="req" aria-hidden="true">*</span></label>
+                      <input class="field__input" type="email" id="BookingEmail" name="contact[email]"
+                        autocomplete="email" required
+                        value="{% if form.email %}{{ form.email }}{% endif %}"
+                        aria-invalid="{% if form.errors contains 'email' %}true{% else %}false{% endif %}">
+                    </div>
+                    <div class="field field--full">
+                      <label class="field__label" for="BookingPhone">Telefon</label>
+                      <input class="field__input" type="tel" id="BookingPhone" name="contact[phone]" autocomplete="tel">
+                      <span class="field__hint">Für schnelle Rückfragen – optional.</span>
+                    </div>
+                  </div>
+                </fieldset>
+
+                <fieldset class="booking-step" data-booking-step="2">
+                  <legend>Fahrzeug & Leistung</legend>
+                  <div class="form-grid">
+                    <div class="field">
+                      <label class="field__label" for="BookingVehicle">Fahrzeugtyp <span class="req" aria-hidden="true">*</span></label>
+                      <select class="field__input" id="BookingVehicle" name="contact[Fahrzeugtyp]" required>
+                        <option value="" disabled selected>Bitte wählen …</option>
+                        {%- for option in vehicle_options -%}
+                          {%- assign opt = option | strip -%}
+                          {%- if opt != blank -%}<option value="{{ opt | escape }}">{{ opt }}</option>{%- endif -%}
+                        {%- endfor -%}
+                      </select>
+                    </div>
+                    <div class="field">
+                      <label class="field__label" for="BookingService">Gewünschte Leistung <span class="req" aria-hidden="true">*</span></label>
+                      <select class="field__input" id="BookingService" name="contact[Leistung]" required>
+                        <option value="" disabled selected>Bitte wählen …</option>
+                        {%- for option in service_options -%}
+                          {%- assign opt = option | strip -%}
+                          {%- if opt != blank -%}<option value="{{ opt | escape }}">{{ opt }}</option>{%- endif -%}
+                        {%- endfor -%}
+                      </select>
+                    </div>
+                  </div>
+                </fieldset>
+
+                <fieldset class="booking-step" data-booking-step="3">
+                  <legend>Wunschtermin & Details</legend>
+                  <div class="form-grid">
+                    <div class="field">
+                      <label class="field__label" for="BookingDate">Wunschtermin <span class="req" aria-hidden="true">*</span></label>
+                      <input class="field__input" type="date" id="BookingDate" name="contact[Wunschtermin]" required data-min-today>
+                    </div>
+                    <div class="field">
+                      <label class="field__label" for="BookingTime">Tageszeit</label>
+                      <select class="field__input" id="BookingTime" name="contact[Tageszeit]">
+                        {%- for option in time_options -%}
+                          {%- assign opt = option | strip -%}
+                          {%- if opt != blank -%}<option value="{{ opt | escape }}">{{ opt }}</option>{%- endif -%}
+                        {%- endfor -%}
+                      </select>
+                    </div>
+                    <div class="field field--full">
+                      <label class="field__label" for="BookingMessage">Nachricht</label>
+                      <textarea class="field__input" id="BookingMessage" name="contact[body]"
+                        placeholder="{{ section.settings.message_placeholder | escape }}"></textarea>
+                    </div>
+                    <div class="field field--full">
+                      <label class="checkbox-field">
+                        <input type="checkbox" name="contact[Datenschutz]" value="zugestimmt" required>
+                        <span>Ich stimme zu, dass meine Angaben zur Bearbeitung der Anfrage verarbeitet werden.
+                          Details in der <a href="/policies/privacy-policy">Datenschutzerklärung</a>. <span class="req" aria-hidden="true">*</span></span>
+                      </label>
+                    </div>
+                  </div>
+                </fieldset>
+
+                <div class="booking-nav">
+                  <button class="btn btn--outline" type="button" data-booking-prev hidden>Zurück</button>
+                  <button class="btn btn--primary" type="button" data-booking-next>Weiter</button>
+                  <button class="btn btn--primary btn--lg" type="submit" data-booking-submit>
+                    <span>Anfrage senden</span>
+                    {%- render 'icon', name: 'send', size: 18 -%}
+                  </button>
+                </div>
+
+                {%- if section.settings.response_note != blank -%}
+                  <p class="booking-hint">
+                    {%- render 'icon', name: 'clock', size: 17 -%}
+                    {{ section.settings.response_note }}
+                  </p>
+                {%- endif -%}
+              </div>
+
+            {%- endif -%}
+          {%- endform -%}
+        {%- endif -%}
+      </div>
+
+      <aside>
+        <div class="aside-card">
+          <h3>{{ section.settings.aside_contact_heading }}</h3>
+          <p class="text-muted">{{ section.settings.aside_contact_text }}</p>
+          {%- if settings.contact_phone != blank -%}
+            <a class="cta-banner__phone" href="tel:{{ settings.contact_phone | replace: ' ', '' }}">
+              {%- render 'icon', name: 'phone', size: 18 -%}{{ settings.contact_phone }}
+            </a>
+          {%- endif -%}
+          {%- if settings.social_whatsapp != blank -%}
+            <a class="cta-banner__phone" href="{{ settings.social_whatsapp }}" target="_blank" rel="noopener">
+              {%- render 'icon', name: 'whatsapp', size: 18 -%}WhatsApp schreiben
+            </a>
+          {%- endif -%}
+        </div>
+
+        {%- if section.settings.aside_steps != blank -%}
+          <div class="aside-card">
+            <h3>{{ section.settings.aside_steps_heading }}</h3>
+            <ol>
+              {%- for step in aside_steps -%}
+                {%- assign s = step | strip -%}
+                {%- if s != blank -%}<li>{{ s }}</li>{%- endif -%}
+              {%- endfor -%}
+            </ol>
+          </div>
+        {%- endif -%}
+      </aside>
+
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Buchungsformular",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_form",
+      "label": "Anfrage-Formular anzeigen",
+      "default": true,
+      "info": "Deaktivieren, wenn stattdessen ausschließlich ein Buchungs-App-Block (z. B. Cowlendar) verwendet wird."
+    },
+    {
+      "type": "textarea",
+      "id": "vehicle_options",
+      "label": "Fahrzeugtypen (einer pro Zeile)",
+      "default": "Kleinwagen\nLimousine\nKombi\nSUV\nVan / Bus\nMotorrad\nSonstiges"
+    },
+    {
+      "type": "textarea",
+      "id": "service_options",
+      "label": "Leistungen (eine pro Zeile)",
+      "default": "Außenreinigung\nInnenreinigung\nPolitur & Lackpflege\nKeramikversiegelung\nScheinwerfer-Aufbereitung\nKomplettpaket\nIndividuelle Anfrage"
+    },
+    {
+      "type": "textarea",
+      "id": "time_options",
+      "label": "Tageszeiten (eine pro Zeile)",
+      "default": "Flexibel\nVormittag\nNachmittag\nAbend"
+    },
+    {
+      "type": "text",
+      "id": "message_placeholder",
+      "label": "Platzhalter Nachricht",
+      "default": "Marke, Modell, Zustand – je mehr Details, desto besser."
+    },
+    {
+      "type": "text",
+      "id": "response_note",
+      "label": "Hinweis unter dem Formular",
+      "default": "Wir melden uns innerhalb von 24 Stunden mit einer Terminbestätigung."
+    },
+    {
+      "type": "header",
+      "content": "Erfolgsmeldung"
+    },
+    {
+      "type": "text",
+      "id": "success_heading",
+      "label": "Überschrift",
+      "default": "Anfrage erhalten – danke!"
+    },
+    {
+      "type": "textarea",
+      "id": "success_text",
+      "label": "Text",
+      "default": "Wir prüfen deinen Wunschtermin und melden uns innerhalb von 24 Stunden bei dir. Schau in der Zwischenzeit gern in unsere Galerie."
+    },
+    {
+      "type": "text",
+      "id": "success_cta_label",
+      "label": "Button-Text",
+      "default": "Zurück zur Startseite"
+    },
+    {
+      "type": "header",
+      "content": "Seitenleiste"
+    },
+    {
+      "type": "text",
+      "id": "aside_contact_heading",
+      "label": "Kontakt-Karte: Überschrift",
+      "default": "Lieber direkt?"
+    },
+    {
+      "type": "textarea",
+      "id": "aside_contact_text",
+      "label": "Kontakt-Karte: Text",
+      "default": "Ruf uns an oder schreib uns – wir beraten dich gern persönlich."
+    },
+    {
+      "type": "text",
+      "id": "aside_steps_heading",
+      "label": "Ablauf-Karte: Überschrift",
+      "default": "So geht's weiter"
+    },
+    {
+      "type": "textarea",
+      "id": "aside_steps",
+      "label": "Ablauf-Schritte (einer pro Zeile)",
+      "default": "Du schickst uns deine Anfrage.\nWir bestätigen Termin & Preis innerhalb von 24 Stunden.\nWir holen dein Auto ab oder du kommst vorbei."
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Abstand oben",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Abstand unten",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 96
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Buchungsformular",
+      "category": "KlaroClean"
+    }
+  ]
+}
+{% endschema %}
