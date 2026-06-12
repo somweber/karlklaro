@@ -30,11 +30,10 @@
   endif
 
   # Paket-Quelle: echte Bundle-Produkte (custom.bundle_includes verweist
-  # auf die enthaltenen Leistungs-Produkte)
-  assign bundles_collection = section.settings.bundles_collection
-  if bundles_collection == blank
-    assign bundles_collection = collections['detailing-bundles']
-  endif
+  # auf die enthaltenen Leistungs-Produkte). Handle-Textfeld statt zweitem
+  # Collection-Picker: Shopify erlaubt nur EIN collection-Setting pro Section.
+  assign bundles_handle = section.settings.bundles_collection_handle | default: 'detailing-bundles'
+  assign bundles_collection = collections[bundles_handle]
   assign has_bundles = false
   if bundles_collection != blank and bundles_collection.products_count > 0
     assign has_bundles = true
@@ -628,10 +627,11 @@
       "info": "Leer = automatisch „detailing-services“."
     },
     {
-      "type": "collection",
-      "id": "bundles_collection",
-      "label": "Paket-Kollektion",
-      "info": "Leer = automatisch „detailing-bundles“. Pakete erscheinen als eigene Kategorie über den Einzelleistungen."
+      "type": "text",
+      "id": "bundles_collection_handle",
+      "label": "Paket-Kollektion (Handle)",
+      "default": "detailing-bundles",
+      "info": "Handle der Paket-Kollektion. Textfeld statt Picker: Shopify erlaubt nur ein Kollektions-Setting pro Section."
     },
     {
       "type": "select",
