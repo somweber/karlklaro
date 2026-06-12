@@ -72,6 +72,16 @@
 
         {%- if mode == 'cart' -%}
 
+          {%- comment -%}
+            Ausgebuchte Termine fürs Frontend (Drei-Zustands-Kalender).
+            Quelle: Shop-Metafeld booking.blocked_dates (Liste von Daten,
+            Pflege im Admin — siehe MIGRATION.md).
+          {%- endcomment -%}
+          <script>
+            window.KlaroClean = window.KlaroClean || {};
+            window.KlaroClean.bookedDates = {{ blocked_dates_json }};
+          </script>
+
           {%- comment -%} Konfiguration & Strings für assets/main.js {%- endcomment -%}
           <script type="application/json" data-booking-config>
             {
@@ -89,6 +99,7 @@
                 "errorDate": {{ 'booking.error_date' | t | json }},
                 "errorAdd": {{ 'booking.error_add' | t | json }},
                 "adding": {{ 'booking.adding' | t | json }},
+                "booked": {{ 'booking.legend_booked' | t | json }},
                 "serviceSingular": {{ 'booking.service_singular' | t | json }},
                 "servicePlural": {{ 'booking.service_plural' | t | json }}
               }
@@ -173,6 +184,16 @@
                     {%- render 'icon', name: 'calendar', size: 17 -%}
                     {{ section.settings.weekend_note }}
                   </p>
+                  {%- comment -%}
+                    Legende = echte Information, kein Deko-Element: Die Swatches
+                    nutzen exakt die Styles der Kalenderzellen, der Text bleibt
+                    für Screenreader lesbar.
+                  {%- endcomment -%}
+                  <ul class="cal-legend">
+                    <li><span class="cal-legend__swatch cal-legend__swatch--available" aria-hidden="true"></span>{{ 'booking.legend_available' | t }}</li>
+                    <li><span class="cal-legend__swatch cal-legend__swatch--booked" aria-hidden="true"></span>{{ 'booking.legend_booked' | t }}</li>
+                    <li><span class="cal-legend__swatch cal-legend__swatch--none" aria-hidden="true"></span>{{ 'booking.legend_none' | t }}</li>
+                  </ul>
                 </div>
                 <div class="field">
                   <label class="field__label" for="BookingTime">{{ 'booking.field_time' | t }}</label>

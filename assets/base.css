@@ -2321,14 +2321,85 @@ body:has(.booking-minibar) { padding-bottom: 72px; }
   color: var(--color-on-accent);
 }
 
-/* Werktage: deutlich ausgegraut, aber lesbar (nicht unsichtbar) */
-.booking-calendar .flatpickr-day.flatpickr-disabled,
-.booking-calendar .flatpickr-day.flatpickr-disabled:hover,
-.booking-calendar .flatpickr-day.prevMonthDay,
-.booking-calendar .flatpickr-day.nextMonthDay {
+/* Zustand „Kein Termin möglich“ (Werktage, Vergangenheit):
+   deutlich ausgegraut, aber lesbar — Ausgebuchtes ist davon ausgenommen */
+.booking-calendar .flatpickr-day.flatpickr-disabled:not(.day-booked),
+.booking-calendar .flatpickr-day.flatpickr-disabled:not(.day-booked):hover,
+.booking-calendar .flatpickr-day.prevMonthDay:not(.day-booked),
+.booking-calendar .flatpickr-day.nextMonthDay:not(.day-booked) {
   color: var(--color-text-muted);
   opacity: 0.35;
   background: transparent;
+}
+
+/* Zustand „Termin verfügbar“ (freie Wochenenden) */
+.booking-calendar .flatpickr-day.day-available {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.booking-calendar .flatpickr-day.day-available:hover,
+.booking-calendar .flatpickr-day.day-available:focus {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+/* Zustand „Ausgebucht“ (gebuchte Wochenenden): Streifen + durchgestrichen,
+   klar unterscheidbar von „kein Termin möglich“ */
+.booking-calendar .flatpickr-day.day-booked,
+.booking-calendar .flatpickr-day.day-booked:hover {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--color-accent-soft) 0 4px,
+    transparent 4px 8px
+  );
+  border-color: transparent;
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+/* Legende: Swatches spiegeln exakt die Zell-Zustände */
+.cal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-lg);
+  margin-top: var(--space-sm);
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.cal-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.cal-legend__swatch {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  border-radius: 4px;
+}
+
+.cal-legend__swatch--available { border: 1px solid var(--color-accent); }
+
+.cal-legend__swatch--booked {
+  border: 1px solid var(--color-line);
+  background: repeating-linear-gradient(
+    45deg,
+    var(--color-accent-soft) 0 4px,
+    transparent 4px 8px
+  );
+}
+
+.cal-legend__swatch--none {
+  border: 1px solid var(--color-line);
+  background: var(--color-surface);
+  opacity: 0.5;
 }
 
 /* Vom Kalender erzeugtes Anzeige-Feld (altInput) */

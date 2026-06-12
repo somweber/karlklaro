@@ -578,6 +578,13 @@
         String(date.getDate()).padStart(2, '0');
     };
 
+    // Ausgebuchte Termine: Section-Config zuerst, window-Global als Fallback
+    // (window.KlaroClean.bookedDates wird in booking-form.liquid gesetzt)
+    var booked = Array.isArray(config.blockedDates) && config.blockedDates.length
+      ? config.blockedDates
+      : ((window.KlaroClean && window.KlaroClean.bookedDates) || []);
+    var strings = config.strings || {};
+
     window.flatpickr(input, {
       locale: locale,
       dateFormat: 'Y-m-d',
@@ -588,16 +595,30 @@
       inline: true, // Kalender dauerhaft sichtbar statt Popup
       disable: [
         function (date) {
-          // Alles AUSSER Samstag (6) und Sonntag (0) deaktivieren
+          // Alles AUSSER Samstag (6) und Sonntag (0) deaktivieren …
           var day = date.getDay();
           if (day !== 0 && day !== 6) return true;
-          // Gesperrte Termine aus dem Shop-Metafeld booking.blocked_dates
-          // (Liste "YYYY-MM-DD"). TODO: ausgebuchte Wochenenden künftig
-          // automatisiert pflegen — der Stub ist bereits verdrahtet.
-          return Array.isArray(config.blockedDates) &&
-            config.blockedDates.indexOf(toIso(date)) !== -1;
+          // … und ausgebuchte Termine (Shop-Metafeld booking.blocked_dates,
+          // Liste "YYYY-MM-DD" — Pflege im Admin, siehe MIGRATION.md)
+          return booked.indexOf(toIso(date)) !== -1;
         }
       ],
+      // Drei-Zustands-Optik: läuft pro Tageszelle bei JEDEM Rendern —
+      // überlebt damit Monatswechsel (im Gegensatz zu Init-Zeit-Klassen).
+      onDayCreate: function (dObj, dStr, fp, dayElem) {
+        var date = dayElem.dateObj;
+        var day = date.getDay();
+        if (day !== 0 && day !== 6) return; // Werktage: Standard-Disabled-Optik
+
+        if (booked.indexOf(toIso(date)) !== -1) {
+          dayElem.classList.add('day-booked');
+          dayElem.setAttribute('aria-label',
+            (dayElem.getAttribute('aria-label') || dStr) + ' – ' + (strings.booked || 'ausgebucht'));
+        } else if (!dayElem.classList.contains('flatpickr-disabled')) {
+          // verfügbar = künftiges Wochenende innerhalb des Buchungsfensters
+          dayElem.classList.add('day-available');
+        }
+      },
       onChange: function (dates, dateStr, instance) {
         onDate(dates.length ? instance.altInput.value : '');
       },

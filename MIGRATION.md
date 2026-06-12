@@ -24,13 +24,23 @@ wird über einen **Wochenend-Kalender** (Flatpickr) gewählt.
 Beide Metafelder sind **optional** — ohne sie zeigen die Karten Beschreibung bzw.
 keine Dauer.
 
-Optional (Kalender-Sperrtermine, derzeit als Stub verdrahtet):
+### Ausgebuchte Termine (Drei-Zustands-Kalender)
 
 | Name | Namespace und Schlüssel | Typ | Objekt |
 |---|---|---|---|
-| Gesperrte Termine | `booking.blocked_dates` | Liste von Datumswerten (`YYYY-MM-DD`) | **Shop** |
+| Gesperrte Termine | `booking.blocked_dates` | **Datum**, „Liste von Werten akzeptieren“ aktiviert (`list.date`) | **Shop** |
 
-Eingetragene Daten werden im Kalender deaktiviert (z. B. ausgebuchte Wochenenden).
+**Definition anlegen:** Einstellungen → Benutzerdefinierte Daten → **Shop** →
+Definition hinzufügen → Name „Gesperrte Termine“, Namespace und Schlüssel
+`booking.blocked_dates`, Typ „Datum“ mit Option „Liste von Werten akzeptieren“.
+
+**Termin als ausgebucht markieren:** Einstellungen → Benutzerdefinierte Daten →
+Shop → „Gesperrte Termine“ → Datum hinzufügen (Format `YYYY-MM-DD`, z. B.
+`2026-06-20`). Der Tag erscheint im Buchungskalender sofort als **Ausgebucht**
+(gestreift + durchgestrichen, nicht klickbar) — klar unterscheidbar von
+Werktagen („Kein Termin möglich“, ausgegraut) und freien Wochenenden
+(„Termin verfügbar“, Akzent-Rahmen). Die Legende unter dem Kalender erklärt
+alle drei Zustände.
 
 ## 2. Produkte (Leistungen) anlegen
 
