@@ -600,6 +600,17 @@
       ],
       onChange: function (dates, dateStr, instance) {
         onDate(dates.length ? instance.altInput.value : '');
+      },
+      // Bugfix Monatsnavigation: disable-Logik nach jedem Monats-/Jahres-
+      // wechsel neu auswerten lassen — sonst können Wochenend-Tage im
+      // Folgemonat fälschlich ausgegraut bleiben. Wichtig: disable bleibt
+      // eine Funktion (keine vorberechneten Daten) und die ISO-Berechnung
+      // ist lokal (toIso) statt toISOString(), das in UTC kippen würde.
+      onMonthChange: function (dates, dateStr, instance) {
+        instance.redraw();
+      },
+      onYearChange: function (dates, dateStr, instance) {
+        instance.redraw();
       }
     });
 
