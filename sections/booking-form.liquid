@@ -29,6 +29,17 @@
     assign services_collection = collections['detailing-services']
   endif
 
+  # Paket-Quelle: echte Bundle-Produkte (custom.bundle_includes verweist
+  # auf die enthaltenen Leistungs-Produkte)
+  assign bundles_collection = section.settings.bundles_collection
+  if bundles_collection == blank
+    assign bundles_collection = collections['detailing-bundles']
+  endif
+  assign has_bundles = false
+  if bundles_collection != blank and bundles_collection.products_count > 0
+    assign has_bundles = true
+  endif
+
   # Modus auflösen: auto → Warenkorb, sobald Produkte existieren
   assign mode = section.settings.mode
   if mode == 'auto'
@@ -134,6 +145,64 @@
               data-next-label="{{ section.settings.next_to_date_label | escape }}">
               <legend>{{ 'booking.step_services' | t }}</legend>
 
+              {%- if has_bundles -%}
+                <h3 class="booking-subhead">{{ 'booking.bundles_heading' | t }}</h3>
+                <div class="service-select-grid service-select-grid--bundles" data-bundle-grid role="group" aria-label="{{ 'booking.bundles_heading' | t }}">
+                  {%- for product in bundles_collection.products -%}
+                    {%- liquid
+                      assign variant = product.selected_or_first_available_variant
+                      assign duration_minutes = product.metafields.custom.duration_minutes.value | default: 0
+                      assign short_text = product.metafields.custom.short_description.value | default: product.description | strip_html | truncate: 90
+                      assign savings = product.metafields.custom.savings_label.value
+                      assign includes = product.metafields.custom.bundle_includes.value
+                      assign include_handles = ''
+                      assign include_titles = ''
+                      for inc in includes
+                        assign include_handles = include_handles | append: inc.handle
+                        assign include_titles = include_titles | append: inc.title
+                        unless forloop.last
+                          assign include_handles = include_handles | append: ','
+                          assign include_titles = include_titles | append: ' · '
+                        endunless
+                      endfor
+                    -%}
+                    <label class="service-select service-select--bundle{% unless product.available %} service-select--soldout{% endunless %}">
+                      <input type="checkbox" class="visually-hidden service-select__input"
+                        value="{{ variant.id }}"
+                        data-service-checkbox
+                        data-bundle-checkbox
+                        data-service-handle="{{ product.handle }}"
+                        data-includes="{{ include_handles }}"
+                        data-title="{{ product.title | escape }}"
+                        data-price-cents="{{ variant.price }}"
+                        data-duration="{{ duration_minutes }}"
+                        aria-label="{{ product.title | escape }}, {{ variant.price | money }}"
+                        {% unless product.available %}disabled data-soldout="1"{% endunless %}>
+                      <span class="service-select__check" aria-hidden="true">
+                        {%- render 'icon', name: 'check', size: 14 -%}
+                      </span>
+                      <span class="service-select__body">
+                        <span class="service-select__title">
+                          {{ product.title | escape }}
+                          {%- if savings != blank %} <span class="service-select__badge">{{ savings | escape }}</span>{% endif -%}
+                        </span>
+                        {%- if short_text != blank -%}
+                          <span class="service-select__desc">{{ short_text }}</span>
+                        {%- endif -%}
+                        {%- if include_titles != blank -%}
+                          <span class="service-select__desc service-select__includes">{{ 'booking.bundle_contains' | t }} {{ include_titles }}</span>
+                        {%- endif -%}
+                        <span class="service-select__meta">
+                          {{ variant.price | money }}
+                          {%- if duration_minutes != 0 %} · {% render 'duration', minutes: duration_minutes %}{% endif -%}
+                        </span>
+                      </span>
+                    </label>
+                  {%- endfor -%}
+                </div>
+                <h3 class="booking-subhead">{{ 'booking.singles_heading' | t }}</h3>
+              {%- endif -%}
+
               <div class="service-select-grid" data-service-grid role="group" aria-label="{{ 'booking.step_services' | t }}">
                 {%- for product in services_collection.products -%}
                   {%- liquid
@@ -150,10 +219,11 @@
                       data-price-cents="{{ variant.price }}"
                       data-duration="{{ duration_minutes }}"
                       aria-label="{{ product.title | escape }}, {{ variant.price | money }}"
-                      {% unless product.available %}disabled{% endunless %}>
+                      {% unless product.available %}disabled data-soldout="1"{% endunless %}>
                     <span class="service-select__check" aria-hidden="true">
                       {%- render 'icon', name: 'check', size: 14 -%}
                     </span>
+                    <span class="service-select__lock" data-bundle-lock hidden>{{ 'booking.in_bundle' | t }}</span>
                     {% render 'responsive-image',
                       image: product.featured_image,
                       alt: '',
@@ -513,6 +583,12 @@
       "id": "services_collection",
       "label": "Leistungs-Kollektion",
       "info": "Leer = automatisch „detailing-services“."
+    },
+    {
+      "type": "collection",
+      "id": "bundles_collection",
+      "label": "Paket-Kollektion",
+      "info": "Leer = automatisch „detailing-bundles“. Pakete erscheinen als eigene Kategorie über den Einzelleistungen."
     },
     {
       "type": "select",

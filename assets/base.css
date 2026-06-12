@@ -2141,6 +2141,59 @@ body:has(.sticky-cta) { padding-bottom: 76px; }
   cursor: not-allowed;
 }
 
+/* Pakete: eigene Kategorie über den Einzelleistungen */
+.booking-subhead {
+  margin: var(--space-lg) 0 var(--space-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-text-muted);
+}
+
+.booking-subhead:first-of-type { margin-top: 0; }
+
+.service-select--bundle {
+  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-line));
+}
+
+.service-select__badge {
+  display: inline-block;
+  margin-left: 0.4em;
+  padding: 0.1em 0.6em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  vertical-align: middle;
+}
+
+.service-select__includes { font-size: 0.8rem; }
+
+/* „Im Paket enthalten“: gesperrt, aber sichtbar erklärt */
+.service-select.is-locked {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.service-select.is-locked:hover { border-color: var(--color-line); }
+
+.service-select__lock {
+  position: absolute;
+  top: var(--space-sm);
+  right: calc(var(--space-sm) + 30px);
+  padding: 0.15em 0.6em;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
 /* Summary-Panel: feste Mindesthöhe gegen Layout-Shift.
    Sticky liegt auf dem Grid-Child .booking-aside — NICHT auf der Karte:
    .booking-layout hat align-items:start, dadurch ist das aside nur so hoch

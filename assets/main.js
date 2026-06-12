@@ -329,7 +329,35 @@
     // Kalender-Modul nutzt exakt dieselbe Logik (eine Quelle der Wahrheit)
     config.isDayFull = isDayFull;
 
+    // Paket-Exklusivität: Leistungen, die in einem gewählten Paket stecken,
+    // werden gesperrt („Im Paket enthalten“) statt doppelt wählbar zu sein.
+    // Wird das Paket abgewählt, sind sie sofort wieder einzeln verfügbar.
+    var applyBundleLocks = function () {
+      var lockedHandles = {};
+      checkboxes.forEach(function (cb) {
+        if (cb.checked && cb.dataset.includes) {
+          cb.dataset.includes.split(',').forEach(function (h) {
+            if (h) lockedHandles[h] = true;
+          });
+        }
+      });
+      checkboxes.forEach(function (cb) {
+        if (cb.dataset.includes !== undefined) return; // Pakete selbst nie sperren
+        var locked = !!lockedHandles[cb.dataset.serviceHandle];
+        if (locked && cb.checked) cb.checked = false; // im Paket → Einzelwahl no-op
+        cb.disabled = locked || cb.dataset.soldout === '1';
+        var card = cb.closest('.service-select');
+        if (card) {
+          card.classList.toggle('is-locked', locked);
+          var lockEl = card.querySelector('[data-bundle-lock]');
+          if (lockEl) lockEl.hidden = !locked;
+        }
+      });
+    };
+
     var updateSummary = function () {
+      applyBundleLocks();
+
       var items = selected();
       var cents = 0;
       var minutes = 0;
@@ -343,6 +371,13 @@
         var card = cb.closest('.service-select');
         if (card) card.classList.toggle('is-selected', cb.checked);
       });
+
+      // Auswahl übersteht Seitenwechsel (Quality Bar) — URL-Param hat Vorrang
+      try {
+        sessionStorage.setItem('klaro-booking-selection', JSON.stringify(
+          items.map(function (cb) { return cb.dataset.serviceHandle; })
+        ));
+      } catch (e) { /* Private Mode o. Ä. — Persistenz ist optional */ }
 
       if (summary) {
         var list = summary.querySelector('[data-summary-list]');
@@ -406,6 +441,19 @@
     checkboxes.forEach(function (cb) {
       cb.addEventListener('change', function () {
         clearError();
+        // Pakete schließen sich gegenseitig aus, sobald sich ihre
+        // enthaltenen Leistungen überlappen (das neue ersetzt das alte).
+        if (cb.checked && cb.dataset.includes !== undefined) {
+          var mine = cb.dataset.includes.split(',');
+          checkboxes.forEach(function (other) {
+            if (other !== cb && other.checked && other.dataset.includes !== undefined) {
+              var overlap = other.dataset.includes.split(',').some(function (h) {
+                return h && mine.indexOf(h) !== -1;
+              });
+              if (overlap) other.checked = false;
+            }
+          });
+        }
         updateSummary();
       });
     });
@@ -422,6 +470,17 @@
         preselected++;
       }
     });
+
+    // Ohne URL-Param: zuletzt gemerkte Auswahl wiederherstellen
+    // (z. B. Rücksprung von /preise auf die Buchungsseite)
+    if (!preselected) {
+      try {
+        JSON.parse(sessionStorage.getItem('klaro-booking-selection') || '[]').forEach(function (handle) {
+          var cb = root.querySelector('[data-service-checkbox][data-service-handle="' + handle + '"]');
+          if (cb && !cb.disabled) cb.checked = true;
+        });
+      } catch (e) { /* defekter Storage-Eintrag → einfach leer starten */ }
+    }
 
     // Natives Date-Input → deutsches Langdatum ableiten
     if (dateInput) {
@@ -529,7 +588,16 @@
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
           items: items.map(function (cb) {
-            return { id: parseInt(cb.value, 10), quantity: 1, properties: properties };
+            var itemProps = {};
+            for (var key in properties) itemProps[key] = properties[key];
+            if (cb.dataset.includes) {
+              // Verstecktes Property (Unterstrich-Prefix): im Admin abfragbar,
+              // für Kund:innen unsichtbar. Die enthaltenen Leistungen werden
+              // bewusst NICHT als eigene Positionen hinzugefügt — Paketpreis
+              // PLUS Einzelpreise würde doppelt verrechnen.
+              itemProps['_bundle_includes'] = cb.dataset.includes;
+            }
+            return { id: parseInt(cb.value, 10), quantity: 1, properties: itemProps };
           })
         })
       })
