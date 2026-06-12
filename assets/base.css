@@ -765,6 +765,12 @@ body.menu-open { overflow: hidden; }
   aspect-ratio: auto;
 }
 
+.hero__media picture {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
 .hero__media img,
 .hero__media svg {
   width: 100%;
