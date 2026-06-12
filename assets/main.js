@@ -404,8 +404,132 @@
         if (mbList) fillList(mbList, items);
       }
 
+      if (typeof updateUpsell === 'function') updateUpsell();
       if (stepper) stepper.render();
     };
+
+    /* ── Paket-Upsell (bundle-recommender.js, pure & getestet) ──
+       Tipp bei genau einer Einzelleistung, Smart-Upgrade ab zwei.
+       Beide nur ohne bereits gewähltes Paket, beide session-dismissbar,
+       und beide schweigen, wenn kein echter Win-Win existiert. */
+    var recommender = (window.KlaroClean && window.KlaroClean.bundleRecommender) || null;
+    var upsellTip = root.querySelector('[data-upsell-tip]');
+    var upgradeEl = root.querySelector('[data-upsell-upgrade]');
+
+    var servicesData = {};
+    var bundlesData = [];
+    checkboxes.forEach(function (cb) {
+      if (cb.dataset.includes !== undefined) {
+        bundlesData.push({
+          handle: cb.dataset.serviceHandle,
+          title: cb.dataset.title,
+          cents: parseInt(cb.dataset.priceCents, 10) || 0,
+          includes: cb.dataset.includes.split(',').filter(Boolean)
+        });
+      } else {
+        servicesData[cb.dataset.serviceHandle] = {
+          cents: parseInt(cb.dataset.priceCents, 10) || 0,
+          title: cb.dataset.title
+        };
+      }
+    });
+
+    var upsellDismissed = function (key) {
+      try { return sessionStorage.getItem('upsell-dismissed-' + key) === '1'; } catch (e) { return false; }
+    };
+    var dismissUpsell = function (key) {
+      try { sessionStorage.setItem('upsell-dismissed-' + key, '1'); } catch (e) { /* optional */ }
+    };
+
+    var extrasNames = function (handles) {
+      return handles.map(function (h) {
+        return (servicesData[h] && servicesData[h].title) || h;
+      }).join(' + ');
+    };
+
+    var fillTemplate = function (tmpl, rec) {
+      return (tmpl || '')
+        .replace('[bundle]', rec.bundle.title)
+        .replace('[extras]', extrasNames(rec.extras))
+        .replace('[delta]', '+' + money.format(rec.upcharge / 100))
+        .replace('[value]', money.format(rec.extrasValue / 100));
+    };
+
+    var switchToBundle = function (handle) {
+      var bundleCb = root.querySelector('[data-bundle-checkbox][data-service-handle="' + handle + '"]');
+      if (!bundleCb || bundleCb.disabled) return;
+      bundleCb.checked = true;
+      // change-Event nutzt die normale Logik: Locks, Exklusivität, Summary
+      bundleCb.dispatchEvent(new Event('change', { bubbles: true }));
+    };
+
+    var updateUpsell = function () {
+      if (!recommender || !bundlesData.length) return;
+      var items = selected();
+      var singles = items.filter(function (cb) { return cb.dataset.includes === undefined; });
+      var singleHandles = singles.map(function (cb) { return cb.dataset.serviceHandle; });
+      var bundleSelected = items.length !== singles.length;
+
+      // Tipp: genau EINE Einzelleistung, kein Paket aktiv
+      if (upsellTip) {
+        var tip = null;
+        if (!bundleSelected && singleHandles.length === 1) {
+          tip = recommender.suggestForService(singleHandles[0], singleHandles, bundlesData, servicesData);
+        }
+        if (tip && !upsellDismissed(tip.bundle.handle)) {
+          upsellTip.querySelector('[data-tip-text]').textContent = fillTemplate(strings.upsellTip, tip);
+          upsellTip.dataset.bundleHandle = tip.bundle.handle;
+          // unter die gewählte Karte schieben (volle Grid-Breite via CSS)
+          var card = singles[0].closest('.service-select');
+          if (card && card.nextElementSibling !== upsellTip) {
+            card.parentNode.insertBefore(upsellTip, card.nextElementSibling);
+          }
+          upsellTip.hidden = false;
+        } else {
+          upsellTip.hidden = true;
+        }
+      }
+
+      // Smart-Upgrade: 2+ Einzelleistungen, nur bei echtem Win-Win
+      if (upgradeEl) {
+        var rec = null;
+        if (!bundleSelected && singleHandles.length >= 2) {
+          rec = recommender.recommendUpgrade(singleHandles, bundlesData, servicesData);
+        }
+        if (rec && !upsellDismissed('upgrade-' + rec.bundle.handle)) {
+          upgradeEl.querySelector('[data-upsell-headline]').textContent = fillTemplate(strings.upsellHeadline, rec);
+          upgradeEl.querySelector('[data-upsell-text]').textContent = fillTemplate(strings.upsellText, rec);
+          upgradeEl.dataset.bundleHandle = rec.bundle.handle;
+          if (upgradeEl.hidden) {
+            // Desktop standardmäßig offen, mobil kollabierte Zeile
+            upgradeEl.open = window.matchMedia('(min-width: 990px)').matches;
+          }
+          upgradeEl.hidden = false;
+        } else {
+          upgradeEl.hidden = true;
+        }
+      }
+    };
+
+    if (upsellTip) {
+      upsellTip.querySelector('[data-tip-accept]').addEventListener('click', function () {
+        switchToBundle(upsellTip.dataset.bundleHandle);
+      });
+      upsellTip.querySelector('[data-tip-dismiss]').addEventListener('click', function () {
+        dismissUpsell(upsellTip.dataset.bundleHandle);
+        upsellTip.hidden = true;
+      });
+    }
+
+    if (upgradeEl) {
+      upgradeEl.querySelector('[data-upsell-accept]').addEventListener('click', function () {
+        switchToBundle(upgradeEl.dataset.bundleHandle);
+      });
+      upgradeEl.querySelector('[data-upsell-dismiss]').addEventListener('click', function () {
+        dismissUpsell('upgrade-' + upgradeEl.dataset.bundleHandle);
+        upgradeEl.hidden = true;
+      });
+    }
 
     // Gewähltes Datum (menschenlesbar) in Summary + Property übernehmen
     var setBookingDate = function (human) {

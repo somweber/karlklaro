@@ -122,6 +122,9 @@
                 "booked": {{ 'booking.legend_booked' | t | json }},
                 "slotsOne": {{ 'booking.slots_one' | t | json }},
                 "slotsOther": {{ 'booking.slots_other' | t | json }},
+                "upsellTip": {{ 'booking.upsell_tip' | t | json }},
+                "upsellHeadline": {{ 'booking.upsell_upgrade_headline' | t | json }},
+                "upsellText": {{ 'booking.upsell_upgrade_text' | t | json }},
                 "serviceSingular": {{ 'booking.service_singular' | t | json }},
                 "servicePlural": {{ 'booking.service_plural' | t | json }}
               }
@@ -245,6 +248,24 @@
                     </span>
                   </label>
                 {%- endfor -%}
+
+                {%- if has_bundles -%}
+                  {%- comment -%}
+                    Sanfter Paket-Tipp (Feature „Upsell bei Einzelleistung“):
+                    wird per JS unter die gewählte Karte verschoben; dezent,
+                    schließbar, kommt nach Dismiss in derselben Session nicht
+                    wieder (sessionStorage).
+                  {%- endcomment -%}
+                  <div class="upsell-tip" data-upsell-tip hidden>
+                    <p class="upsell-tip__text" data-tip-text></p>
+                    <div class="upsell-tip__actions">
+                      <button class="btn btn--outline btn--sm" type="button" data-tip-accept>{{ 'booking.upsell_switch' | t }}</button>
+                      <button class="upsell-tip__close" type="button" data-tip-dismiss aria-label="{{ 'booking.upsell_no' | t }}">
+                        {%- render 'icon', name: 'close', size: 14 -%}
+                      </button>
+                    </div>
+                  </div>
+                {%- endif -%}
               </div>
             </fieldset>
 
@@ -327,6 +348,28 @@
                 </div>
               </div>
             </fieldset>
+
+            {%- if has_bundles -%}
+              {%- comment -%}
+                Smart-Upgrade-Banner (Feature „Empfehlung bei 2+ Leistungen“):
+                als <details> mobil kollabierbar statt Overlay; erscheint nur,
+                wenn Kund:in UND Geschäft profitieren (bundle-recommender.js).
+              {%- endcomment -%}
+              <details class="upsell-upgrade" data-upsell-upgrade hidden>
+                <summary class="upsell-upgrade__summary">
+                  <span aria-hidden="true">💡</span>
+                  <span data-upsell-headline></span>
+                  {%- render 'icon', name: 'chevron-down', size: 16 -%}
+                </summary>
+                <div class="upsell-upgrade__body">
+                  <p data-upsell-text></p>
+                  <div class="upsell-upgrade__actions">
+                    <button class="btn btn--primary btn--sm" type="button" data-upsell-accept>{{ 'booking.upsell_switch' | t }}</button>
+                    <button class="btn btn--ghost btn--sm" type="button" data-upsell-dismiss>{{ 'booking.upsell_no' | t }}</button>
+                  </div>
+                </div>
+              </details>
+            {%- endif -%}
 
             <div class="booking-nav">
               <button class="btn btn--outline" type="button" data-booking-prev hidden>{{ 'booking.back' | t }}</button>
