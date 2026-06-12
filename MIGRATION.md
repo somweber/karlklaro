@@ -135,8 +135,16 @@ Positionen hinzugefügt — das würde doppelt verrechnen.
 Leistung, Smart-Upgrade ab zwei) — nur bei echtem Win-Win, session-dismissbar.
 Tests: `node assets/bundle-recommender.test.js`.
 
-**Angelegte Bundle-Produkte:** _(Handles und bestätigte Preise werden nach
-der Preisfreigabe ergänzt — siehe PR.)_
+**Angelegte Bundle-Produkte** (Preise vom Händler bestätigt):
+
+| Paket | Handle | Preis | Enthält | Dauer |
+|---|---|---|---|---|
+| Basic Pflege | `basic-pflege` | **129 €** (Einzelwert 148 €, „Spare 19 €“) | Handwäsche + Innenreinigung | 240 Min. |
+| Premium Detail | `premium-detail` | **399 €** (Einzelwert 476 €, „Spare 77 €“) | Basic + Einstufige Politur + Scheinwerfer | 780 Min. |
+| Full Detail | `full-detail` | **619 €** (Einzelwert 775 €, „Spare 156 €“) | Premium + Keramik Basis | 1260 Min. |
+
+⚠️ **Produktbilder fehlen noch** — bitte im Admin dunkle, stimmungsvolle Fotos
+(Hero-Ästhetik) zu den drei Paketen hochladen.
 
 ## Newsletter-Versand
 
