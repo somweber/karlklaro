@@ -39,6 +39,13 @@
     "read_more": "Weiterlesen",
     "back": "Zurück zur Übersicht"
   },
+  "newsletter": {
+    "label": "E-Mail-Adresse",
+    "placeholder": "deine@email.at",
+    "submit": "Anmelden",
+    "success": "Danke! Du bekommst ab jetzt Pflege-Tipps und Aktionen von uns.",
+    "error": "Das hat nicht geklappt – bitte überprüfe die E-Mail-Adresse."
+  },
   "password": {
     "label": "Passwort",
     "submit": "Öffnen",

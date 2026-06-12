@@ -647,11 +647,16 @@ body.menu-open { overflow: hidden; }
 }
 
 @media (min-width: 750px) {
-  .site-footer__grid { grid-template-columns: 1.4fr 1fr 1fr; }
+  .site-footer__grid { grid-template-columns: 1fr 1fr; }
+
+  .site-footer__brand { grid-column: 1 / -1; }
 }
 
 @media (min-width: 990px) {
-  .site-footer__grid { grid-template-columns: 1.6fr 1fr 1fr 1.2fr; }
+  /* 5 Spalten: Marke · Leistungen · Unternehmen · Kontakt · Folge uns */
+  .site-footer__grid { grid-template-columns: 1.5fr 1fr 1fr 1.2fr 1.4fr; }
+
+  .site-footer__brand { grid-column: auto; }
 }
 
 .site-footer__blurb {
@@ -723,6 +728,56 @@ body.menu-open { overflow: hidden; }
   color: var(--color-accent);
 }
 
+/* Footer-eigene Social-Reihe sitzt direkt unter der Spalten-Überschrift */
+.site-footer .social-row { margin-top: 0; }
+
+/* Newsletter (form 'customer') */
+.newsletter { margin-top: var(--space-xl); }
+
+.newsletter .site-footer__heading { margin-bottom: var(--space-sm); }
+
+.newsletter-form__row {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.newsletter-form__row .field__input {
+  min-width: 0;
+  padding: 0.6em 0.9em;
+  font-size: 0.9rem;
+}
+
+.newsletter-form__success {
+  color: var(--color-success);
+  font-size: 0.9rem;
+}
+
+.newsletter-form__error {
+  color: var(--color-error);
+  font-size: 0.9rem;
+  margin-bottom: var(--space-xs);
+}
+
+/* Zahlungsarten: offizielle Badges, ruhig entsättigt, Farbe beim Hover */
+.site-footer__payments {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+  padding-block: var(--space-lg);
+  border-top: 1px solid var(--color-line-soft);
+}
+
+.payment-icon {
+  height: 32px;
+  width: auto;
+  border-radius: 3px;
+  filter: grayscale(1) brightness(1.9) opacity(0.75);
+  transition: filter var(--transition);
+}
+
+.payment-icon:hover { filter: none; }
+
 .site-footer__bottom {
   display: flex;
   flex-wrap: wrap;
@@ -730,7 +785,7 @@ body.menu-open { overflow: hidden; }
   justify-content: space-between;
   align-items: center;
   padding-block: var(--space-lg);
-  border-top: 1px solid var(--color-line);
+  border-top: 1px solid var(--color-line-soft);
   color: var(--color-text-muted);
   font-size: 0.85rem;
 }
