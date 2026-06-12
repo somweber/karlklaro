@@ -4,8 +4,8 @@
       "type": "page-hero",
       "settings": {
         "eyebrow": "Über uns",
-        "heading": "Drei Freunde. Eine Mission.",
-        "text": "KlaroClean steht für Fahrzeugpflege auf höchstem Niveau – gegründet in Innsbruck, verwurzelt in Tirol, angetrieben von echter Leidenschaft fürs Detail."
+        "heading": "Drei Profis. Ein Anspruch: Perfektion.",
+        "text": "KlaroClean ist Fahrzeugaufbereitung auf Werkstatt-Niveau: definierte Prozesse, geprüfte Produkte, ehrliche Beratung. In Innsbruck zuhause, in ganz Tirol im Einsatz."
       }
     },
     "story": {
@@ -28,9 +28,9 @@
       "settings": {
         "layout": "left",
         "image_alt": "Das KlaroClean-Team bei der Arbeit in der Werkstatt",
-        "eyebrow": "Unsere Geschichte",
-        "heading": "Aus Leidenschaft wurde Präzision.",
-        "text": "<p>KlaroClean wurde von drei Freunden aus Innsbruck gegründet, die eines verbindet: die Überzeugung, dass Autopflege Handwerk ist. Was in einer Garage mit Poliermaschine und viel Geduld begann, ist heute ein professioneller Detailing-Betrieb für ganz Tirol.</p><p>Wir arbeiten ausschließlich mit Produkten, die wir selbst getestet haben – und geben kein Fahrzeug aus der Hand, bevor es unserem eigenen Anspruch genügt.</p>",
+        "eyebrow": "Unser Anspruch",
+        "heading": "Detailing als Handwerk – nicht als Service.",
+        "text": "<p>Wir verstehen Fahrzeugaufbereitung als Handwerk: klar definierte Abläufe, dokumentierte Ergebnisse und ein Finish, das wir unter Halogenlicht abnehmen – nicht im Gegenlicht des Parkplatzes.</p><p>Verarbeitet wird nur Material, das wir selbst geprüft haben. Und kein Fahrzeug verlässt die Werkstatt, bevor es unserem Standard entspricht – aus Innsbruck, für ganz Tirol.</p>",
         "background": "base",
         "padding_top": 96,
         "padding_bottom": 96
