@@ -57,7 +57,15 @@
           {%- endif -%}
 
           {%- liquid
-            assign tier_cta_url = block.settings.cta_url | default: settings.booking_url
+            # Buchungs-Link: optional mit ?services=<handles> — die Buchungsseite
+            # wählt diese Leistungen vor. Pakete sind reine Theme-Konfiguration,
+            # KEINE eigenen Shopify-Produkte (eine Quelle der Wahrheit: die
+            # Kollektion detailing-services).
+            assign tier_cta_url = block.settings.cta_url | default: settings.booking_url | default: '/pages/buchung'
+            if block.settings.included_services != blank
+              assign tier_services = block.settings.included_services | replace: ' ', ''
+              assign tier_cta_url = tier_cta_url | append: '?services=' | append: tier_services
+            endif
             assign tier_style = 'outline'
             if block.settings.featured
               assign tier_style = 'primary'
@@ -205,6 +213,12 @@
           "id": "cta_label",
           "label": "Button-Text",
           "default": "Paket anfragen"
+        },
+        {
+          "type": "text",
+          "id": "included_services",
+          "label": "Enthaltene Leistungen (Produkt-Handles)",
+          "info": "Kommagetrennt, z. B. handwaesche-exterieur,innenreinigung-komplett — werden auf der Buchungsseite vorausgewählt."
         },
         {
           "type": "url",

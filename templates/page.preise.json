@@ -20,7 +20,8 @@
             "price_note": "pro Fahrzeug, inkl. USt.",
             "features": "Außenwäsche per Hand\nInnenraum saugen & wischen\nScheiben innen & außen\nKunststoffpflege innen\nDauer: ca. 2 Stunden",
             "featured": false,
-            "cta_label": "Basic anfragen"
+            "cta_label": "Basic buchen",
+            "included_services": "handwaesche-exterieur,innenreinigung-komplett"
           }
         },
         "tier-premium": {
@@ -33,7 +34,8 @@
             "features": "Alles aus Basic Pflege\nInnenreinigung komplett\nEinstufige Maschinenpolitur\nLack- & Felgenversiegelung\nDauer: ca. 1 Tag",
             "featured": true,
             "badge": "Beliebteste Wahl",
-            "cta_label": "Premium anfragen"
+            "cta_label": "Premium buchen",
+            "included_services": "handwaesche-exterieur,innenreinigung-komplett,einstufige-politur"
           }
         },
         "tier-full": {
@@ -45,7 +47,8 @@
             "price_note": "pro Fahrzeug, inkl. USt.",
             "features": "Alles aus Premium Detail\nMehrstufige Politur\nKeramikversiegelung Basis\nMotorraum- & Türfalzenreinigung\nDauer: 1–2 Tage",
             "featured": false,
-            "cta_label": "Full Detail anfragen"
+            "cta_label": "Full Detail buchen",
+            "included_services": "handwaesche-exterieur,innenreinigung-komplett,mehrstufige-politur,keramik-basis"
           }
         }
       },

@@ -399,14 +399,18 @@
       });
     });
 
-    // Vorauswahl über ?services=handle1,handle2 (CTAs der Leistungs-Karten)
+    // Vorauswahl über ?services=handle1,handle2 — genutzt von den
+    // Leistungs-Karten und den Paketen auf /preise (Bundles sind reine
+    // URL-Konfiguration, keine eigenen Produkte).
+    var preselected = 0;
     var params = new URLSearchParams(window.location.search);
-    if (params.get('services')) {
-      params.get('services').split(',').forEach(function (handle) {
-        var cb = root.querySelector('[data-service-checkbox][data-handle="' + handle.trim() + '"]');
-        if (cb && !cb.disabled) cb.checked = true;
-      });
-    }
+    (params.get('services') || '').split(',').filter(Boolean).forEach(function (handle) {
+      var cb = root.querySelector('[data-service-checkbox][data-service-handle="' + handle.trim() + '"]');
+      if (cb && !cb.disabled && !cb.checked) {
+        cb.checked = true;
+        preselected++;
+      }
+    });
 
     // Natives Date-Input → deutsches Langdatum ableiten
     if (dateInput) {
@@ -543,6 +547,13 @@
     });
 
     updateSummary();
+
+    // Nach URL-Vorauswahl direkt zur Terminauswahl springen, damit die
+    // nächste Aktion sichtbar ist (Schritt 1 ist ja bereits erledigt).
+    if (preselected > 0 && stepper && stepper.next()) {
+      var motion = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+      root.scrollIntoView({ behavior: motion, block: 'start' });
+    }
   }
 
   /* ── Wochenend-Kalender (Flatpickr) ──────────────────────────
