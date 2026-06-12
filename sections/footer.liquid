@@ -109,6 +109,9 @@
         {%- if section.settings.show_newsletter -%}
           <div class="newsletter">
             <h2 class="site-footer__heading">{{ section.settings.newsletter_heading }}</h2>
+            {%- if section.settings.newsletter_text != blank -%}
+              <p class="newsletter__text">{{ section.settings.newsletter_text }}</p>
+            {%- endif -%}
             {%- comment -%}
               form 'customer' = Shopifys Newsletter-Anmeldung: legt die Adresse
               als Kund:in mit Marketing-Einwilligung an (Tag „newsletter“).
@@ -247,6 +250,12 @@
       "id": "newsletter_heading",
       "label": "Newsletter: Überschrift",
       "default": "Newsletter"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_text",
+      "label": "Newsletter: Nutzenversprechen",
+      "default": "Saisonale Tipps zur Lackpflege. Keine Werbung."
     },
     {
       "type": "header",
