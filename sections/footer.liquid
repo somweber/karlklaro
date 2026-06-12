@@ -10,9 +10,23 @@
     Shop-Richtlinien (Impressum, AGB, Datenschutz, Widerruf …).
 {%- endcomment -%}
 
+{%- liquid
+  # Bugfix: Spaltenzahl = tatsächliche Kinderzahl. Die Menü-Spalten sind
+  # konditional — eine starre 5er-Trackliste erzeugt sonst leere Spalten.
+  # Liquid baut die Trackliste passend; CSS konsumiert --footer-cols.
+  assign footer_cols = '1.5fr'
+  if section.settings.menu_2 != blank
+    assign footer_cols = footer_cols | append: ' 1fr'
+  endif
+  if section.settings.menu != blank
+    assign footer_cols = footer_cols | append: ' 1fr'
+  endif
+  assign footer_cols = footer_cols | append: ' 1.2fr 1.4fr'
+-%}
+
 <footer class="site-footer">
   <div class="page-width">
-    <div class="site-footer__grid">
+    <div class="site-footer__grid" style="--footer-cols: {{ footer_cols }};">
       <div class="site-footer__brand">
         {%- if section.settings.logo != blank -%}
           {{ section.settings.logo | image_url: width: 320 | image_tag: widths: '160, 320', style: 'width: 150px', alt: shop.name }}

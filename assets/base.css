@@ -653,8 +653,13 @@ body.menu-open { overflow: hidden; }
 }
 
 @media (min-width: 990px) {
-  /* 5 Spalten: Marke · Leistungen · Unternehmen · Kontakt · Folge uns */
-  .site-footer__grid { grid-template-columns: 1.5fr 1fr 1fr 1.2fr 1.4fr; }
+  /* Trackliste kommt aus Liquid (--footer-cols) und entspricht IMMER der
+     tatsächlichen Spaltenzahl — keine leeren Grid-Spalten, wenn Menüs
+     nicht belegt sind. Volle Belegung: Marke · Leistungen · Unternehmen ·
+     Kontakt · Folge uns. */
+  .site-footer__grid {
+    grid-template-columns: var(--footer-cols, 1.5fr 1fr 1fr 1.2fr 1.4fr);
+  }
 
   .site-footer__brand { grid-column: auto; }
 }
