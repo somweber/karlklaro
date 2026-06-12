@@ -112,6 +112,39 @@ Für jede Leistung ein Produkt (**Produkte → Produkt hinzufügen**):
 - Das Buchungsdatum steht zusätzlich als **Cart-/Bestell-Attribut „Buchungsdatum“**
   an der gesamten Bestellung; die Nachricht der Kund:innen als Bestellnotiz.
 
+## Pakete (Bundles) als echte Produkte
+
+Pakete leben in der Kollektion **`detailing-bundles`** und sind normale
+Shopify-Produkte. Das Theme liest:
+
+| Name | Namespace und Schlüssel | Typ | Objekt | Verwendung |
+|---|---|---|---|---|
+| Enthaltene Leistungen | `custom.bundle_includes` | **Liste von Produkt-Referenzen** (`list.product_reference`) | Produkt | Inhalts-Liste auf /preise + Buchung, Sperr-Logik, Upsell-Empfehlungen |
+| Dauer (Minuten) | `custom.duration_minutes` | Ganzzahl | Produkt | Summe der enthaltenen Leistungen (manuell pflegen) |
+| Ersparnis-Label | `custom.savings_label` | Einzeiliger Text | Produkt | Badge, z. B. „Spare 35 €“ |
+
+**Verhalten:** Auf der Buchungsseite erscheinen Pakete als eigene Kategorie.
+Ein gewähltes Paket sperrt seine enthaltenen Einzelleistungen („Im Paket
+enthalten“); im Warenkorb landet **nur das Paket** als Position — die
+enthaltenen Leistungen hängen als verstecktes Property `_bundle_includes`
+an (Unterstrich-Prefix = unsichtbar für Kund:innen, abfragbar im Admin).
+Bewusste Abweichung: enthaltene Leistungen werden NICHT als eigene bepreiste
+Positionen hinzugefügt — das würde doppelt verrechnen.
+
+**Upsell:** `assets/bundle-recommender.js` schlägt Pakete vor (Tipp bei einer
+Leistung, Smart-Upgrade ab zwei) — nur bei echtem Win-Win, session-dismissbar.
+Tests: `node assets/bundle-recommender.test.js`.
+
+**Angelegte Bundle-Produkte:** _(Handles und bestätigte Preise werden nach
+der Preisfreigabe ergänzt — siehe PR.)_
+
+## Newsletter-Versand
+
+Die Footer-Anmeldung legt Kund:innen mit Tag **`newsletter`** und
+Marketing-Einwilligung an (Shopify-Bordmittel, keine App). Für den
+tatsächlichen Versand später Shopify Email, Klaviyo oder Brevo verbinden
+und auf das Kundensegment mit Tag `newsletter` zielen.
+
 ## Technische Referenz (für Entwickler:innen)
 
 - Quelle der Leistungen: Section-Setting `collection` → Fallback
