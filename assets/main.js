@@ -172,6 +172,7 @@
       // Schritt-spezifische Beschriftung („Weiter zur Terminauswahl“ …)
       next.textContent = steps[current].dataset.nextLabel || defaultNextLabel;
       if (opts.isNextDisabled) next.disabled = !!opts.isNextDisabled(steps[current]);
+      if (opts.onRender) opts.onRender();
     };
 
     // Native Validierung nur für die Felder des aktuellen Schritts
@@ -189,10 +190,7 @@
     };
 
     next.addEventListener('click', function () {
-      if (opts.validateStep && !opts.validateStep(steps[current])) return;
-      if (!nativeValid(steps[current])) return;
-      current = Math.min(current + 1, steps.length - 1);
-      render();
+      if (!goNext()) return;
       var focusable = steps[current].querySelector('input:not([type="hidden"]), select, textarea');
       if (focusable && focusable.dataset.skipNative !== '1') focusable.focus();
     });
@@ -202,9 +200,18 @@
       render();
     });
 
+    var goNext = function () {
+      if (opts.validateStep && !opts.validateStep(steps[current])) return false;
+      if (!nativeValid(steps[current])) return false;
+      current = Math.min(current + 1, steps.length - 1);
+      render();
+      return true;
+    };
+
     render();
     return {
       render: render,
+      next: goNext,
       getStep: function () { return steps[current]; }
     };
   }
@@ -258,6 +265,36 @@
       return checkboxes.filter(function (cb) { return cb.checked; });
     };
 
+    // Gemeinsamer Listen-Renderer für Summary (Aside) und Mobile-Minibar
+    var fillList = function (listEl, items) {
+      listEl.textContent = '';
+      items.forEach(function (cb) {
+        var li = document.createElement('li');
+        var title = document.createElement('span');
+        title.textContent = cb.dataset.title;
+        var price = document.createElement('span');
+        price.textContent = money.format((parseInt(cb.dataset.priceCents, 10) || 0) / 100);
+        li.appendChild(title);
+        li.appendChild(price);
+        listEl.appendChild(li);
+      });
+    };
+
+    // Minibar-CTA spiegelt den jeweils aktiven echten Button (Weiter/Submit)
+    var syncMinibarCta = function () {
+      if (!minibar) return;
+      var cta = minibar.querySelector('[data-minibar-cta]');
+      if (!cta) return;
+      var nextBtn = root.querySelector('[data-booking-next]');
+      var submitBtn = root.querySelector('[data-booking-submit]');
+      var src = nextBtn && !nextBtn.hidden ? nextBtn : submitBtn;
+      if (src) {
+        var label = src.querySelector('[data-booking-submit-label]') || src;
+        cta.textContent = label.textContent;
+        cta.disabled = src.disabled;
+      }
+    };
+
     var showError = function (msg) {
       if (!errorBox) return;
       errorBox.textContent = msg;
@@ -301,17 +338,7 @@
         var totals = summary.querySelector('[data-summary-totals]');
         var empty = summary.querySelector('[data-summary-empty]');
 
-        list.textContent = '';
-        items.forEach(function (cb) {
-          var li = document.createElement('li');
-          var title = document.createElement('span');
-          title.textContent = cb.dataset.title;
-          var price = document.createElement('span');
-          price.textContent = money.format((parseInt(cb.dataset.priceCents, 10) || 0) / 100);
-          li.appendChild(title);
-          li.appendChild(price);
-          list.appendChild(li);
-        });
+        fillList(list, items);
 
         empty.hidden = items.length > 0;
         list.hidden = items.length === 0;
@@ -327,6 +354,8 @@
           items.length ? money.format(cents / 100) : '';
         minibar.querySelector('[data-minibar-duration]').textContent =
           items.length ? formatDuration(minutes) : '';
+        var mbList = minibar.querySelector('[data-minibar-list]');
+        if (mbList) fillList(mbList, items);
       }
 
       if (stepper) stepper.render();
@@ -342,6 +371,7 @@
     };
 
     var stepper = setupStepper(root, {
+      onRender: syncMinibarCta,
       isNextDisabled: function (stepEl) {
         return !!stepEl.querySelector('[data-service-grid]') && selected().length === 0;
       },
@@ -394,6 +424,42 @@
 
     // Upgrade auf Flatpickr-Wochenend-Kalender (Feature 3)
     initBookingCalendar(root, config, setBookingDate);
+
+    // Mobile-Minibar: Aufklappen, CTA-Proxy, Fade-out am Formular-Ende
+    if (minibar) {
+      var mbToggle = minibar.querySelector('[data-minibar-toggle]');
+      var mbPanel = minibar.querySelector('[data-minibar-panel]');
+      var mbCta = minibar.querySelector('[data-minibar-cta]');
+
+      if (mbToggle && mbPanel) {
+        mbToggle.addEventListener('click', function () {
+          var open = mbPanel.hidden;
+          mbPanel.hidden = !open;
+          mbToggle.setAttribute('aria-expanded', String(open));
+          minibar.classList.toggle('is-open', open);
+        });
+      }
+
+      if (mbCta) {
+        mbCta.addEventListener('click', function () {
+          // Proxy auf die echten Buttons → identische Validierung & Meldungen
+          var nextBtn = root.querySelector('[data-booking-next]');
+          var submitBtn = root.querySelector('[data-booking-submit]');
+          (nextBtn && !nextBtn.hidden ? nextBtn : submitBtn).click();
+          var motion = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+          root.scrollIntoView({ behavior: motion, block: 'start' });
+        });
+      }
+
+      // Fade-out via IntersectionObserver (keine Scroll-Listener):
+      // sobald die echte Button-Leiste sichtbar ist, weicht die Minibar.
+      var nav = root.querySelector('.booking-nav');
+      if (nav && 'IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+          minibar.classList.toggle('is-out', entries[0].isIntersecting);
+        }, { threshold: 0.4 }).observe(nav);
+      }
+    }
 
     var submit = root.querySelector('[data-booking-submit]');
     submit.addEventListener('click', function () {

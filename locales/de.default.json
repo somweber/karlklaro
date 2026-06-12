@@ -71,6 +71,7 @@
     "selected_date": "Termin",
     "service_singular": "Leistung",
     "service_plural": "Leistungen",
+    "continue": "Weiter",
     "error_no_service": "Bitte wähle mindestens eine Leistung aus.",
     "error_date": "Bitte wähle einen Termin am Wochenende aus.",
     "error_add": "Deine Auswahl konnte nicht zum Warenkorb hinzugefügt werden. Bitte versuch es erneut.",

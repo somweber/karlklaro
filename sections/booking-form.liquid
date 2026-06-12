@@ -376,7 +376,7 @@
         {%- endif -%}
       </div>
 
-      <aside>
+      <aside class="booking-aside">
         {%- if mode == 'cart' -%}
           {%- comment -%}
             Summary-Panel: immer gerendert (kein Layout-Shift), Desktop sticky.
@@ -435,11 +435,27 @@
   </div>
 
   {%- if mode == 'cart' -%}
-    {%- comment -%} Mobile Bottom-Bar: kompakte Zusammenfassung (Desktop: Aside) {%- endcomment -%}
+    {%- comment -%}
+      Mobile Bottom-Bar: eingeklappt Summe + Weiter-CTA, per Tap aufklappbar
+      (Liste der gewählten Leistungen). Blendet sich aus, sobald die echten
+      Formular-Buttons sichtbar sind (IntersectionObserver in main.js).
+    {%- endcomment -%}
     <div class="booking-minibar" data-booking-minibar>
-      <strong data-minibar-count>0</strong>
-      <span data-minibar-total></span>
-      <span class="booking-minibar__duration" data-minibar-duration></span>
+      <div class="booking-minibar__panel" id="MinibarPanel" data-minibar-panel hidden>
+        <ul class="booking-summary__list" data-minibar-list></ul>
+      </div>
+      <div class="booking-minibar__bar">
+        <button class="booking-minibar__toggle" type="button" data-minibar-toggle
+          aria-expanded="false" aria-controls="MinibarPanel">
+          <strong data-minibar-count>0</strong>
+          <span data-minibar-total></span>
+          <span class="booking-minibar__duration" data-minibar-duration></span>
+          {%- render 'icon', name: 'chevron-down', size: 18 -%}
+        </button>
+        <button class="btn btn--primary btn--sm" type="button" data-minibar-cta>
+          {{- 'booking.continue' | t -}}
+        </button>
+      </div>
     </div>
   {%- endif -%}
 </section>
