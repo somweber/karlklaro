@@ -48,12 +48,18 @@
     assign redirect_path = routes.cart_url
   endif
 
-  # TODO (optional): Bereits ausgebuchte Wochenenden über das Shop-Metafeld
-  # booking.blocked_dates (Liste von Datumswerten "YYYY-MM-DD") pflegen.
-  # Der Stub reicht die Daten bereits an den Kalender in main.js durch.
+  # Kalender-Verfügbarkeit, zwei Quellen:
+  # 1. booking.blocked_dates (Liste) — MANUELLE Sperren (Urlaub, Krankheit)
+  # 2. booking.daily_bookings (json, Map "YYYY-MM-DD" → Anzahl) — Zähler;
+  #    ein Tag ist erst „ausgebucht“, wenn die Kapazität (Einstellung,
+  #    Standard 3 parallele Termine) erreicht ist. Pflege siehe MIGRATION.md.
   assign blocked_dates_json = '[]'
   if shop.metafields.booking.blocked_dates.value != blank
     assign blocked_dates_json = shop.metafields.booking.blocked_dates.value | json
+  endif
+  assign daily_bookings_json = '{}'
+  if shop.metafields.booking.daily_bookings.value != blank
+    assign daily_bookings_json = shop.metafields.booking.daily_bookings.value | json
   endif
 -%}
 
@@ -80,6 +86,7 @@
           <script>
             window.KlaroClean = window.KlaroClean || {};
             window.KlaroClean.bookedDates = {{ blocked_dates_json }};
+            window.KlaroClean.dailyBookings = {{ daily_bookings_json }};
           </script>
 
           {%- comment -%} Konfiguration & Strings für assets/main.js {%- endcomment -%}
@@ -90,7 +97,9 @@
               "redirect": {{ redirect_path | json }},
               "currency": {{ cart.currency.iso_code | json }},
               "maxDays": {{ section.settings.booking_window_days | default: 90 }},
+              "capacity": {{ section.settings.booking_capacity | default: 3 }},
               "blockedDates": {{ blocked_dates_json }},
+              "dailyBookings": {{ daily_bookings_json }},
               "strings": {
                 "approx": {{ 'booking.approx' | t | json }},
                 "hour": {{ 'booking.hours_short' | t | json }},
@@ -100,6 +109,8 @@
                 "errorAdd": {{ 'booking.error_add' | t | json }},
                 "adding": {{ 'booking.adding' | t | json }},
                 "booked": {{ 'booking.legend_booked' | t | json }},
+                "slotsOne": {{ 'booking.slots_one' | t | json }},
+                "slotsOther": {{ 'booking.slots_other' | t | json }},
                 "serviceSingular": {{ 'booking.service_singular' | t | json }},
                 "servicePlural": {{ 'booking.service_plural' | t | json }}
               }
@@ -522,6 +533,16 @@
       "step": 15,
       "unit": "Tg",
       "default": 90
+    },
+    {
+      "type": "range",
+      "id": "booking_capacity",
+      "label": "Termine pro Tag (Kapazität)",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 3,
+      "info": "Ein Tag gilt erst als ausgebucht, wenn booking.daily_bookings diese Anzahl erreicht."
     },
     {
       "type": "text",

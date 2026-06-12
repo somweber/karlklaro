@@ -308,15 +308,26 @@
       errorBox.textContent = '';
     };
 
-    // Wochenend-/Sperrtermin-Check (gilt auch für das native Date-Input,
+    // Wochenend-/Kapazitäts-Check (gilt auch für das native Date-Input,
     // falls Flatpickr nicht geladen wurde)
     var isWeekend = function (iso) {
       var day = new Date(iso + 'T12:00:00').getDay();
       return day === 0 || day === 6;
     };
-    var isBlocked = function (iso) {
-      return Array.isArray(config.blockedDates) && config.blockedDates.indexOf(iso) !== -1;
+
+    // Ein Tag ist „ausgebucht“, wenn er MANUELL gesperrt ist
+    // (booking.blocked_dates, z. B. Urlaub) ODER der Buchungszähler
+    // (booking.daily_bookings) die Tageskapazität erreicht — Standard 3
+    // parallele Termine, nicht schon nach der ersten Buchung.
+    var capacity = config.capacity || 3;
+    var manualBlocked = Array.isArray(config.blockedDates) ? config.blockedDates : [];
+    var dailyBookings = config.dailyBookings || {};
+    var isDayFull = function (iso) {
+      if (manualBlocked.indexOf(iso) !== -1) return true;
+      return (dailyBookings[iso] || 0) >= capacity;
     };
+    // Kalender-Modul nutzt exakt dieselbe Logik (eine Quelle der Wahrheit)
+    config.isDayFull = isDayFull;
 
     var updateSummary = function () {
       var items = selected();
@@ -383,7 +394,7 @@
         }
         if (dateInput && stepEl.contains(dateInput)) {
           var iso = dateInput.value;
-          if (!iso || !isWeekend(iso) || isBlocked(iso)) {
+          if (!iso || !isWeekend(iso) || isDayFull(iso)) {
             showError(strings.errorDate);
             return false;
           }
@@ -578,11 +589,18 @@
         String(date.getDate()).padStart(2, '0');
     };
 
-    // Ausgebuchte Termine: Section-Config zuerst, window-Global als Fallback
-    // (window.KlaroClean.bookedDates wird in booking-form.liquid gesetzt)
-    var booked = Array.isArray(config.blockedDates) && config.blockedDates.length
+    // Verfügbarkeit: Section-Config zuerst, window-Globals als Fallback
+    // (beide werden in booking-form.liquid gesetzt)
+    var capacity = config.capacity || 3;
+    var manualBlocked = Array.isArray(config.blockedDates) && config.blockedDates.length
       ? config.blockedDates
       : ((window.KlaroClean && window.KlaroClean.bookedDates) || []);
+    var dailyBookings = config.dailyBookings ||
+      (window.KlaroClean && window.KlaroClean.dailyBookings) || {};
+    var isDayFull = config.isDayFull || function (iso) {
+      if (manualBlocked.indexOf(iso) !== -1) return true;
+      return (dailyBookings[iso] || 0) >= capacity;
+    };
     var strings = config.strings || {};
 
     window.flatpickr(input, {
@@ -598,9 +616,8 @@
           // Alles AUSSER Samstag (6) und Sonntag (0) deaktivieren …
           var day = date.getDay();
           if (day !== 0 && day !== 6) return true;
-          // … und ausgebuchte Termine (Shop-Metafeld booking.blocked_dates,
-          // Liste "YYYY-MM-DD" — Pflege im Admin, siehe MIGRATION.md)
-          return booked.indexOf(toIso(date)) !== -1;
+          // … und volle Tage: manuell gesperrt ODER Kapazität erreicht
+          return isDayFull(toIso(date));
         }
       ],
       // Drei-Zustands-Optik: läuft pro Tageszelle bei JEDEM Rendern —
@@ -610,13 +627,25 @@
         var day = date.getDay();
         if (day !== 0 && day !== 6) return; // Werktage: Standard-Disabled-Optik
 
-        if (booked.indexOf(toIso(date)) !== -1) {
+        var iso = toIso(date);
+        if (isDayFull(iso)) {
           dayElem.classList.add('day-booked');
           dayElem.setAttribute('aria-label',
             (dayElem.getAttribute('aria-label') || dStr) + ' – ' + (strings.booked || 'ausgebucht'));
         } else if (!dayElem.classList.contains('flatpickr-disabled')) {
           // verfügbar = künftiges Wochenende innerhalb des Buchungsfensters
           dayElem.classList.add('day-available');
+          // Dezenter Hinweis auf Restplätze — nur im aria-label/Tooltip,
+          // nicht in der Zelle selbst ("Samstag, 14. Juni – noch 1 Termin verfügbar")
+          var count = dailyBookings[iso] || 0;
+          if (count > 0 && count < capacity) {
+            var left = capacity - count;
+            var tmpl = (left === 1 ? strings.slotsOne : strings.slotsOther) || 'noch # verfügbar';
+            var hint = tmpl.replace('#', left);
+            dayElem.setAttribute('aria-label',
+              (dayElem.getAttribute('aria-label') || dStr) + ' – ' + hint);
+            dayElem.setAttribute('title', hint);
+          }
         }
       },
       onChange: function (dates, dateStr, instance) {

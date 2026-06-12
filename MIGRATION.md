@@ -24,7 +24,33 @@ wird über einen **Wochenend-Kalender** (Flatpickr) gewählt.
 Beide Metafelder sind **optional** — ohne sie zeigen die Karten Beschreibung bzw.
 keine Dauer.
 
-### Ausgebuchte Termine (Drei-Zustands-Kalender)
+### Tageskapazität: Buchungszähler (NEU)
+
+| Name | Namespace und Schlüssel | Typ | Objekt |
+|---|---|---|---|
+| Buchungen pro Tag | `booking.daily_bookings` | **JSON** | **Shop** |
+
+Beispielwert: `{ "2026-06-13": 2, "2026-06-14": 3, "2026-06-20": 1 }`
+
+Ein Tag gilt erst als **ausgebucht**, wenn der Zähler die Kapazität erreicht
+(Theme-Editor → Buchungsformular → „Termine pro Tag“, Standard **3**). Tage mit
+1–2 Buchungen bleiben buchbar und zeigen im Tooltip/Screenreader dezent
+„noch X Termine verfügbar“. Die Liste `booking.blocked_dates` (unten) bleibt
+als **manueller Override** bestehen — Urlaub/Krankheit sperrt den Tag sofort,
+unabhängig vom Zähler.
+
+**Buchungszähler automatisch pflegen — zwei Optionen:**
+
+1. **Shopify Flow (empfohlen):** Workflow „Order created → Condition
+   (Cart-Attribut `Buchungsdatum` vorhanden) → Run code (Zähler im JSON
+   erhöhen) → Update metafield“. Die vollständige Bauanleitung inklusive
+   Run-code-Snippet liegt im Repo: **`flow/increment-booking-count.json`**
+   (Flow-Exporte sind store-gebunden, daher als Nachbau-Vorlage).
+2. **Manuell:** Nach jeder Buchung im Admin (Einstellungen →
+   Benutzerdefinierte Daten → Shop → „Buchungen pro Tag“) den Zähler für das
+   Datum erhöhen. Für geringes Volumen okay, skaliert nicht.
+
+### Manuell gesperrte Termine (Override)
 
 | Name | Namespace und Schlüssel | Typ | Objekt |
 |---|---|---|---|

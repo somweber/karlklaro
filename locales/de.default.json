@@ -79,6 +79,8 @@
     "service_singular": "Leistung",
     "service_plural": "Leistungen",
     "continue": "Weiter",
+    "slots_one": "noch # Termin verfügbar",
+    "slots_other": "noch # Termine verfügbar",
     "legend_available": "Termin verfügbar",
     "legend_booked": "Ausgebucht",
     "legend_none": "Kein Termin möglich",

@@ -1,0 +1,32 @@
+{
+  "_hinweis": "Shopify-Flow-Exporte sind store-gebunden und nicht portabel importierbar. Diese Datei ist die exakte Bauanleitung des Workflows — in Shopify Flow in ~3 Minuten nachgebaut (Schritte unten 1:1 anlegen). Details: MIGRATION.md → 'Buchungszähler automatisch pflegen'.",
+  "name": "Buchungszähler erhöhen (booking.daily_bookings)",
+  "trigger": {
+    "type": "Order created",
+    "beschreibung": "Feuert bei jeder neuen Bestellung."
+  },
+  "steps": [
+    {
+      "step": 1,
+      "type": "Condition",
+      "bedingung": "order.attributes['Buchungsdatum'] is not empty",
+      "beschreibung": "Nur Buchungs-Bestellungen zählen (das Theme setzt das Cart-Attribut 'Buchungsdatum' bei jeder Online-Buchung)."
+    },
+    {
+      "step": 2,
+      "type": "Run code",
+      "input_variables": ["order"],
+      "beschreibung": "Liest das Wunschtermin-Datum aus der Line-Item-Property und erhöht den Zähler im Shop-Metafeld-JSON. WICHTIG: Im 'Run code'-Schritt unter 'Input' das Shop-Metafeld booking.daily_bookings als Variable 'currentMap' hinzufügen.",
+    "code": "export default function main(input) {\n  // ISO-Datum aus der Line-Item-Property 'Wunschtermin' ziehen.\n  // Das Theme speichert dort das deutsche Langdatum UND das Cart-Attribut\n  // 'Buchungsdatum'; fuer den Zaehler brauchen wir YYYY-MM-DD — wir parsen\n  // das deutsche Datum ('Samstag, 14. Juni 2026') nach ISO.\n  const MONTHS = {Januar:1,Februar:2,März:3,April:4,Mai:5,Juni:6,Juli:7,August:8,September:9,Oktober:10,November:11,Dezember:12};\n  const prop = (input.order.lineItems || [])\n    .flatMap(li => li.customAttributes || [])\n    .find(a => a.key === 'Wunschtermin');\n  if (!prop) return { skip: true };\n  const m = prop.value.match(/(\\d{1,2})\\. (\\w+) (\\d{4})/);\n  if (!m) return { skip: true };\n  const iso = `${m[3]}-${String(MONTHS[m[2]]).padStart(2,'0')}-${String(m[1]).padStart(2,'0')}`;\n  const map = JSON.parse(input.currentMap || '{}');\n  map[iso] = (map[iso] || 0) + 1;\n  return { newMap: JSON.stringify(map), skip: false };\n}"
+    },
+    {
+      "step": 3,
+      "type": "Update metafield",
+      "ziel": "Shop",
+      "namespace": "booking",
+      "key": "daily_bookings",
+      "value": "{{ runCode.newMap }}",
+      "beschreibung": "Schreibt die aktualisierte Map zurück. Bedingung davor: runCode.skip ist false."
+    }
+  ]
+}
