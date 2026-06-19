@@ -596,19 +596,72 @@ textarea.field__input {
   .site-header__burger { display: none; }
 }
 
-/* Mobiles Menü (Vollbild-Drawer unter dem Header) */
+/* Mobiles Vollbild-Menü.
+   WICHTIG: Das Element liegt als Geschwister von <header> (siehe
+   header.liquid), NICHT darin. .site-header hat backdrop-filter, und ein
+   Element mit backdrop-filter wird zum Containing-Block für
+   position:fixed-Kinder — dort eingeschlossen schrumpfte das Menü auf
+   Header-Höhe statt den Viewport zu füllen (genau das war der Bug). Als
+   Geschwister bezieht sich fixed wieder auf den Viewport; inset:0 füllt
+   ihn randlos. Weil top UND bottom gepinnt sind, gibt es kein
+   100vh-Problem auf iOS Safari (die dynamische Toolbar verschiebt nichts). */
 .mobile-menu {
   position: fixed;
-  inset: var(--header-height) 0 0 0;
+  inset: 0;
   z-index: var(--z-drawer);
   background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
-  padding: var(--space-xl) var(--gutter) var(--space-3xl);
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: opacity 0.28s var(--ease), transform 0.28s var(--ease),
+    visibility 0s linear 0.28s;
 }
+
+.mobile-menu.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity 0.28s var(--ease), transform 0.28s var(--ease);
+}
+
+/* Sicherheitsnetz: ab Desktop nie sichtbar (der Burger ist dort ausgeblendet) */
+@media (min-width: 990px) {
+  .mobile-menu { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-menu { transition-duration: 0s; transform: none; }
+}
+
+/* Menü-Kopfzeile: Wortmarke + Schließen-X (Höhe = Header, damit das X
+   genau dort sitzt, wo zuvor der Burger war) */
+.mobile-menu__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--header-height);
+  padding-inline: var(--gutter);
+  border-bottom: 1px solid var(--color-line);
+}
+
+.mobile-menu__close {
+  display: inline-flex;
+  padding: var(--space-xs);
+  margin-right: calc(var(--space-xs) * -1);
+  color: var(--color-text);
+}
+
+.mobile-menu__close:hover { color: var(--color-accent); }
 
 .mobile-menu__nav {
   display: grid;
   gap: var(--space-xs);
+  padding: var(--space-xl) var(--gutter) 0;
 }
 
 .mobile-menu__link {
@@ -628,9 +681,21 @@ textarea.field__input {
   gap: var(--space-lg);
   color: var(--color-text-muted);
   font-size: 0.95rem;
+  padding: 0 var(--gutter) var(--space-3xl);
 }
 
-body.menu-open { overflow: hidden; }
+/* Scroll-Lock ohne Layout-Shift: Body wird fixiert, JS merkt sich die
+   Scroll-Position und stellt sie beim Schließen wieder her. Verhindert
+   das iOS-„Rubber-Band“-Scrollen hinter dem Overlay; ein etwaiger
+   Scrollbar-Versatz bleibt unsichtbar, weil das Menü den Viewport
+   vollständig bedeckt. JS setzt zusätzlich body.style.top = -scrollY. */
+body.menu-open {
+  position: fixed;
+  left: 0;
+  right: 0;
+  width: 100%;
+  overflow: hidden;
+}
 
 /* ── 07 Footer ──────────────────────────────────────────────── */
 .site-footer {

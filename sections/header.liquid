@@ -58,43 +58,59 @@
       </button>
     </div>
   </div>
-
-  <nav id="MobileMenu" class="mobile-menu" hidden aria-label="Mobiles Menü">
-    <div class="mobile-menu__nav">
-      {%- for link in menu.links -%}
-        <a class="mobile-menu__link" href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>
-          {{ link.title }}
-        </a>
-      {%- endfor -%}
-    </div>
-
-    <div class="mobile-menu__meta">
-      {%- if cta_url != blank -%}
-        <a class="btn btn--primary btn--block" href="{{ cta_url }}">{{ cta_label }}</a>
-      {%- endif -%}
-
-      {%- if settings.contact_phone != blank -%}
-        <a href="tel:{{ settings.contact_phone | replace: ' ', '' }}">{{ settings.contact_phone }}</a>
-      {%- endif -%}
-      {%- if settings.contact_email != blank -%}
-        <a href="mailto:{{ settings.contact_email }}">{{ settings.contact_email }}</a>
-      {%- endif -%}
-
-      <div class="social-row">
-        {%- if settings.social_instagram != blank -%}
-          <a class="social-row__link" href="{{ settings.social_instagram }}" target="_blank" rel="noopener" aria-label="Instagram">
-            {%- render 'icon', name: 'instagram', size: 20 -%}
-          </a>
-        {%- endif -%}
-        {%- if settings.maps_link != blank -%}
-          <a class="social-row__link" href="{{ settings.maps_link }}" target="_blank" rel="noopener" aria-label="Google Maps">
-            {%- render 'icon', name: 'map-pin', size: 20 -%}
-          </a>
-        {%- endif -%}
-      </div>
-    </div>
-  </nav>
 </header>
+
+{%- comment -%}
+  Das mobile Menü liegt BEWUSST außerhalb von <header class="site-header">:
+  .site-header nutzt backdrop-filter, was es zum Containing-Block für
+  position:fixed-Kinder macht — darin eingeschlossen konnte das Menü den
+  Viewport nicht füllen. Als Geschwister des Headers bezieht sich fixed
+  wieder auf den Viewport. Eigenes Schließen-X, da das Vollbild-Overlay
+  die Header-Leiste (mit dem Burger) verdeckt.
+{%- endcomment -%}
+<nav id="MobileMenu" class="mobile-menu" hidden aria-label="Mobiles Menü">
+  <div class="mobile-menu__bar">
+    <span class="site-header__wordmark">Klaro<span class="accent">Clean</span></span>
+    <button class="mobile-menu__close" type="button" data-menu-close>
+      <span class="visually-hidden">{{ 'general.close' | t }}</span>
+      {%- render 'icon', name: 'close', size: 26 -%}
+    </button>
+  </div>
+
+  <div class="mobile-menu__nav">
+    {%- for link in menu.links -%}
+      <a class="mobile-menu__link" href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>
+        {{ link.title }}
+      </a>
+    {%- endfor -%}
+  </div>
+
+  <div class="mobile-menu__meta">
+    {%- if cta_url != blank -%}
+      <a class="btn btn--primary btn--block" href="{{ cta_url }}">{{ cta_label }}</a>
+    {%- endif -%}
+
+    {%- if settings.contact_phone != blank -%}
+      <a href="tel:{{ settings.contact_phone | replace: ' ', '' }}">{{ settings.contact_phone }}</a>
+    {%- endif -%}
+    {%- if settings.contact_email != blank -%}
+      <a href="mailto:{{ settings.contact_email }}">{{ settings.contact_email }}</a>
+    {%- endif -%}
+
+    <div class="social-row">
+      {%- if settings.social_instagram != blank -%}
+        <a class="social-row__link" href="{{ settings.social_instagram }}" target="_blank" rel="noopener" aria-label="Instagram">
+          {%- render 'icon', name: 'instagram', size: 20 -%}
+        </a>
+      {%- endif -%}
+      {%- if settings.maps_link != blank -%}
+        <a class="social-row__link" href="{{ settings.maps_link }}" target="_blank" rel="noopener" aria-label="Google Maps">
+          {%- render 'icon', name: 'map-pin', size: 20 -%}
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+</nav>
 
 {% schema %}
 {

@@ -32,25 +32,40 @@
     var menu = document.getElementById('MobileMenu');
     if (!toggle || !menu) return;
 
+    var closeBtn = menu.querySelector('[data-menu-close]');
+    var isOpen = false;
+    var scrollY = 0;
+
+    // JS ist aktiv → das hidden-Attribut (No-JS-Fallback) entfernen, damit
+    // die Sichtbarkeit per CSS-Klasse animiert gesteuert werden kann.
+    menu.removeAttribute('hidden');
+
     var setOpen = function (open) {
+      if (open === isOpen) return; // idempotent: kein versehentliches scrollTo
+      isOpen = open;
       toggle.setAttribute('aria-expanded', String(open));
-      menu.hidden = !open;
-      document.body.classList.toggle('menu-open', open);
+      menu.classList.toggle('is-open', open);
+
       if (open) {
-        var firstLink = menu.querySelector('a');
-        if (firstLink) firstLink.focus();
+        // Scroll-Position merken und Body fixieren (Scroll-Lock ohne Shift)
+        scrollY = window.scrollY;
+        document.body.style.top = '-' + scrollY + 'px';
+        document.body.classList.add('menu-open');
+        // Fokus auf das Schließen-X (erstes fokussierbares Element)
+        (menu.querySelector('button, a') || menu).focus();
+      } else {
+        document.body.classList.remove('menu-open');
+        document.body.style.top = '';
+        window.scrollTo(0, scrollY); // exakte Position wiederherstellen
+        toggle.focus(); // Fokus zurück zum Burger
       }
     };
 
-    toggle.addEventListener('click', function () {
-      setOpen(toggle.getAttribute('aria-expanded') !== 'true');
-    });
+    toggle.addEventListener('click', function () { setOpen(!isOpen); });
+    if (closeBtn) closeBtn.addEventListener('click', function () { setOpen(false); });
 
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && !menu.hidden) {
-        setOpen(false);
-        toggle.focus();
-      }
+      if (e.key === 'Escape' && isOpen) setOpen(false);
     });
 
     // Nach Klick auf einen Menüpunkt (z. B. Anker) schließen
