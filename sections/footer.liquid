@@ -1,11 +1,32 @@
 {%- comment -%}
-  sections/footer.liquid — Footer mit Markenblock, zwei Menüs,
-  Kontaktdaten (aus Theme-Einstellungen) und Rechtliches-Leiste.
+  sections/footer.liquid — Footer mit fünf Spalten (Desktop):
+  Marke · Leistungen · Unternehmen · Kontakt · Folge uns (+ Newsletter).
+  Darunter: Zahlungsarten (offizielle Shopify-Badges) und Rechtliches.
+
+  - Newsletter nutzt Shopifys Kunden-Formular (form 'customer') — keine App nötig.
+  - Zahlungsarten kommen aus shop.enabled_payment_types (immer aktuell,
+    offizielle Marken-SVGs via payment_type_svg_tag).
+  - Rechtliches: gewähltes Menü, sonst automatisch alle veröffentlichten
+    Shop-Richtlinien (Impressum, AGB, Datenschutz, Widerruf …).
 {%- endcomment -%}
+
+{%- liquid
+  # Bugfix: Spaltenzahl = tatsächliche Kinderzahl. Die Menü-Spalten sind
+  # konditional — eine starre 5er-Trackliste erzeugt sonst leere Spalten.
+  # Liquid baut die Trackliste passend; CSS konsumiert --footer-cols.
+  assign footer_cols = '1.5fr'
+  if section.settings.menu_2 != blank
+    assign footer_cols = footer_cols | append: ' 1fr'
+  endif
+  if section.settings.menu != blank
+    assign footer_cols = footer_cols | append: ' 1fr'
+  endif
+  assign footer_cols = footer_cols | append: ' 1.2fr 1.4fr'
+-%}
 
 <footer class="site-footer">
   <div class="page-width">
-    <div class="site-footer__grid">
+    <div class="site-footer__grid" style="--footer-cols: {{ footer_cols }};">
       <div class="site-footer__brand">
         {%- if section.settings.logo != blank -%}
           {{ section.settings.logo | image_url: width: 320 | image_tag: widths: '160, 320', style: 'width: 150px', alt: shop.name }}
@@ -16,47 +37,24 @@
         {%- if section.settings.blurb != blank -%}
           <p class="site-footer__blurb">{{ section.settings.blurb }}</p>
         {%- endif -%}
-
-        <div class="social-row">
-          {%- if settings.social_instagram != blank -%}
-            <a class="social-row__link" href="{{ settings.social_instagram }}" target="_blank" rel="noopener" aria-label="Instagram">
-              {%- render 'icon', name: 'instagram', size: 20 -%}
-            </a>
-          {%- endif -%}
-          {%- if settings.social_facebook != blank -%}
-            <a class="social-row__link" href="{{ settings.social_facebook }}" target="_blank" rel="noopener" aria-label="Facebook">
-              {%- render 'icon', name: 'facebook', size: 20 -%}
-            </a>
-          {%- endif -%}
-          {%- if settings.social_whatsapp != blank -%}
-            <a class="social-row__link" href="{{ settings.social_whatsapp }}" target="_blank" rel="noopener" aria-label="WhatsApp">
-              {%- render 'icon', name: 'whatsapp', size: 20 -%}
-            </a>
-          {%- endif -%}
-          {%- if settings.maps_link != blank -%}
-            <a class="social-row__link" href="{{ settings.maps_link }}" target="_blank" rel="noopener" aria-label="Google Maps">
-              {%- render 'icon', name: 'map-pin', size: 20 -%}
-            </a>
-          {%- endif -%}
-        </div>
       </div>
 
-      {%- if section.settings.menu != blank -%}
-        <nav aria-label="Footer-Navigation">
-          <h2 class="site-footer__heading">{{ section.settings.menu_heading }}</h2>
+      {%- if section.settings.menu_2 != blank -%}
+        <nav aria-label="{{ section.settings.menu_2_heading | escape }}">
+          <h2 class="site-footer__heading">{{ section.settings.menu_2_heading }}</h2>
           <ul class="site-footer__list">
-            {%- for link in section.settings.menu.links -%}
+            {%- for link in section.settings.menu_2.links -%}
               <li><a href="{{ link.url }}">{{ link.title }}</a></li>
             {%- endfor -%}
           </ul>
         </nav>
       {%- endif -%}
 
-      {%- if section.settings.menu_2 != blank -%}
-        <nav aria-label="Leistungs-Navigation">
-          <h2 class="site-footer__heading">{{ section.settings.menu_2_heading }}</h2>
+      {%- if section.settings.menu != blank -%}
+        <nav aria-label="{{ section.settings.menu_heading | escape }}">
+          <h2 class="site-footer__heading">{{ section.settings.menu_heading }}</h2>
           <ul class="site-footer__list">
-            {%- for link in section.settings.menu_2.links -%}
+            {%- for link in section.settings.menu.links -%}
               <li><a href="{{ link.url }}">{{ link.title }}</a></li>
             {%- endfor -%}
           </ul>
@@ -92,19 +90,80 @@
           {%- endif -%}
         </div>
       </div>
+
+      <div>
+        <h2 class="site-footer__heading">{{ section.settings.follow_heading }}</h2>
+        <div class="social-row">
+          {%- if settings.social_instagram != blank -%}
+            <a class="social-row__link" href="{{ settings.social_instagram }}" target="_blank" rel="noopener" aria-label="Instagram">
+              {%- render 'icon', name: 'instagram', size: 20 -%}
+            </a>
+          {%- endif -%}
+          {%- if settings.social_tiktok != blank -%}
+            <a class="social-row__link" href="{{ settings.social_tiktok }}" target="_blank" rel="noopener" aria-label="TikTok">
+              {%- render 'icon', name: 'tiktok', size: 20 -%}
+            </a>
+          {%- endif -%}
+        </div>
+
+        {%- if section.settings.show_newsletter -%}
+          <div class="newsletter">
+            <h2 class="site-footer__heading">{{ section.settings.newsletter_heading }}</h2>
+            {%- if section.settings.newsletter_text != blank -%}
+              <p class="newsletter__text">{{ section.settings.newsletter_text }}</p>
+            {%- endif -%}
+            {%- comment -%}
+              form 'customer' = Shopifys Newsletter-Anmeldung: legt die Adresse
+              als Kund:in mit Marketing-Einwilligung an (Tag „newsletter“).
+            {%- endcomment -%}
+            {%- form 'customer', id: 'FooterNewsletter', class: 'newsletter-form' -%}
+              <input type="hidden" name="contact[tags]" value="newsletter">
+              {%- if form.posted_successfully? -%}
+                <p class="newsletter-form__success" role="status">{{ 'newsletter.success' | t }}</p>
+              {%- else -%}
+                {%- if form.errors -%}
+                  <p class="newsletter-form__error" role="alert">{{ 'newsletter.error' | t }}</p>
+                {%- endif -%}
+                <div class="newsletter-form__row">
+                  <label class="visually-hidden" for="FooterNewsletterEmail">{{ 'newsletter.label' | t }}</label>
+                  <input class="field__input" type="email" id="FooterNewsletterEmail"
+                    name="contact[email]" placeholder="{{ 'newsletter.placeholder' | t }}"
+                    autocomplete="email" required>
+                  <button class="btn btn--primary btn--sm" type="submit">{{ 'newsletter.submit' | t }}</button>
+                </div>
+              {%- endif -%}
+            {%- endform -%}
+          </div>
+        {%- endif -%}
+      </div>
     </div>
+
+    {%- if section.settings.show_payment and shop.enabled_payment_types.size > 0 -%}
+      <div class="site-footer__payments" aria-label="Akzeptierte Zahlungsarten">
+        {%- for type in shop.enabled_payment_types -%}
+          {{ type | payment_type_svg_tag: class: 'payment-icon' }}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
 
     <div class="site-footer__bottom">
       <span>© {{ 'now' | date: '%Y' }} {{ shop.name }}. Alle Rechte vorbehalten.</span>
-      {%- if section.settings.legal_menu != blank -%}
-        <nav aria-label="Rechtliches">
-          <ul class="site-footer__legal">
+      <nav aria-label="Rechtliches">
+        <ul class="site-footer__legal">
+          {%- if section.settings.legal_menu != blank -%}
             {%- for link in section.settings.legal_menu.links -%}
               <li><a href="{{ link.url }}">{{ link.title }}</a></li>
             {%- endfor -%}
-          </ul>
-        </nav>
-      {%- endif -%}
+          {%- else -%}
+            {%- comment -%} Fallback: alle veröffentlichten Shop-Richtlinien {%- endcomment -%}
+            {%- for policy in shop.policies -%}
+              {%- if policy != blank -%}
+                <li><a href="{{ policy.url }}">{{ policy.title }}</a></li>
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endif -%}
+        </ul>
+      </nav>
     </div>
   </div>
 </footer>
@@ -127,23 +186,7 @@
     },
     {
       "type": "header",
-      "content": "Menü 1"
-    },
-    {
-      "type": "text",
-      "id": "menu_heading",
-      "label": "Überschrift",
-      "default": "Navigation"
-    },
-    {
-      "type": "link_list",
-      "id": "menu",
-      "label": "Menü",
-      "default": "footer"
-    },
-    {
-      "type": "header",
-      "content": "Menü 2 (optional)"
+      "content": "Spalte: Leistungen"
     },
     {
       "type": "text",
@@ -158,7 +201,23 @@
     },
     {
       "type": "header",
-      "content": "Kontakt-Spalte"
+      "content": "Spalte: Unternehmen"
+    },
+    {
+      "type": "text",
+      "id": "menu_heading",
+      "label": "Überschrift",
+      "default": "Unternehmen"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menü",
+      "default": "footer"
+    },
+    {
+      "type": "header",
+      "content": "Spalte: Kontakt"
     },
     {
       "type": "text",
@@ -172,12 +231,48 @@
     },
     {
       "type": "header",
-      "content": "Rechtliches"
+      "content": "Spalte: Folge uns & Newsletter"
+    },
+    {
+      "type": "text",
+      "id": "follow_heading",
+      "label": "Überschrift",
+      "default": "Folge uns"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_newsletter",
+      "label": "Newsletter-Anmeldung anzeigen",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "newsletter_heading",
+      "label": "Newsletter: Überschrift",
+      "default": "Newsletter"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_text",
+      "label": "Newsletter: Nutzenversprechen",
+      "default": "Saisonale Tipps zur Lackpflege. Keine Werbung."
+    },
+    {
+      "type": "header",
+      "content": "Zahlungsarten & Rechtliches"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment",
+      "label": "Zahlungsarten anzeigen",
+      "default": true,
+      "info": "Zeigt automatisch die im Shop aktivierten Zahlungsarten (offizielle Badges)."
     },
     {
       "type": "link_list",
       "id": "legal_menu",
-      "label": "Menü (Impressum, Datenschutz, AGB)"
+      "label": "Menü Rechtliches (Impressum, AGB, Datenschutz, Widerruf)",
+      "info": "Leer = automatisch alle veröffentlichten Shop-Richtlinien."
     }
   ]
 }

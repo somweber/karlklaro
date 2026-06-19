@@ -1,7 +1,24 @@
 {%- comment -%}
   sections/services-overview.liquid — Leistungs-Highlights als Karten
-  (Startseite). Karten verlinken auf Anker der Leistungsseite.
+  (Startseite).
+
+  Leistungs-Quelle (Feature „Services als Produkte“):
+  1. Im Theme-Editor gewählte Kollektion — sonst automatisch die Kollektion
+     „detailing-services“ (Collection-Picker erlaubt keine Schema-Defaults).
+  2. Hat die Kollektion Produkte, werden diese gerendert (Pflege im Admin).
+  3. Fallback: manuelle Blöcke (bisheriges Verhalten), zuletzt Hinweistext.
 {%- endcomment -%}
+
+{%- liquid
+  assign services_collection = section.settings.collection
+  if services_collection == blank
+    assign services_collection = collections['detailing-services']
+  endif
+  assign use_products = false
+  if services_collection != blank and services_collection.products_count > 0
+    assign use_products = true
+  endif
+-%}
 
 <section class="section section--{{ section.settings.background }}"
   style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
@@ -16,20 +33,35 @@
       {%- endif -%}
     </header>
 
-    <div class="grid" style="--cols: {{ section.settings.columns }}; --cols-md: 2;">
-      {%- for block in section.blocks -%}
-        {%- assign delay = forloop.index0 | times: 0.08 -%}
-        {% render 'service-card',
-          icon: block.settings.icon,
-          title: block.settings.title,
-          text: block.settings.text,
-          url: block.settings.url,
-          link_label: block.settings.link_label,
-          attrs: block.shopify_attributes,
-          reveal_delay: delay
-        %}
-      {%- endfor -%}
-    </div>
+    {%- if use_products -%}
+      <div class="grid" style="--cols: {{ section.settings.columns }}; --cols-md: 2;">
+        {%- for product in services_collection.products limit: section.settings.products_limit -%}
+          {%- assign delay = forloop.index0 | times: 0.08 -%}
+          {% render 'service-card',
+            product: product,
+            cta_label: section.settings.product_cta_label,
+            reveal_delay: delay
+          %}
+        {%- endfor -%}
+      </div>
+    {%- elsif section.blocks.size > 0 -%}
+      <div class="grid" style="--cols: {{ section.settings.columns }}; --cols-md: 2;">
+        {%- for block in section.blocks -%}
+          {%- assign delay = forloop.index0 | times: 0.08 -%}
+          {% render 'service-card',
+            icon: block.settings.icon,
+            title: block.settings.title,
+            text: block.settings.text,
+            url: block.settings.url,
+            link_label: block.settings.link_label,
+            attrs: block.shopify_attributes,
+            reveal_delay: delay
+          %}
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      <p class="lead">{{ 'booking.collection_empty' | t }}</p>
+    {%- endif -%}
 
     {%- if section.settings.cta_label != blank and section.settings.cta_url != blank -%}
       <div class="testimonials__more">
@@ -43,6 +75,38 @@
 {
   "name": "Leistungs-Übersicht",
   "settings": [
+    {
+      "type": "header",
+      "content": "Leistungs-Quelle"
+    },
+    {
+      "type": "paragraph",
+      "content": "Mit Kollektion werden Leistungen als Produkte aus dem Admin gezogen (Titel, Preis, Bild, Beschreibung). Leer = automatisch „detailing-services“. Ohne Produkte greifen die manuellen Blöcke."
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Leistungs-Kollektion"
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "label": "Maximale Anzahl Produkte",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "text",
+      "id": "product_cta_label",
+      "label": "Produkt-Button: Text",
+      "default": "Zur Buchung hinzufügen"
+    },
+    {
+      "type": "header",
+      "content": "Inhalt"
+    },
     {
       "type": "text",
       "id": "eyebrow",

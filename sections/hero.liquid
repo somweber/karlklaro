@@ -6,14 +6,34 @@
 
 <section class="hero hero--{{ section.settings.height }}">
   <div class="hero__media">
-    {% render 'responsive-image',
-      image: section.settings.image,
-      alt: section.settings.image_alt,
-      sizes: '100vw',
-      loading: 'eager',
-      placeholder: 'lifestyle-2',
-      class: 'media--plain'
-    %}
+    {%- if section.settings.image != blank -%}
+      {%- comment -%} Im Theme-Editor gewähltes Bild hat immer Vorrang {%- endcomment -%}
+      {% render 'responsive-image',
+        image: section.settings.image,
+        alt: section.settings.image_alt,
+        sizes: '100vw',
+        loading: 'eager',
+        placeholder: 'lifestyle-2',
+        class: 'media--plain'
+      %}
+    {%- else -%}
+      {%- comment -%}
+        Gebündeltes Marken-Hero (dunkles Studio-Artwork, SVG).
+        Der geplante Unsplash-Stock-Download war aus der Build-Umgebung
+        nicht möglich (Netzwerk-Allowlist blockiert images.unsplash.com).
+        Echte Fotos später: assets/hero-detail.jpg (2400×1600) und
+        assets/hero-detail-mobile.jpg (1200×800) hochladen und unten die
+        beiden Dateinamen tauschen — oder einfach ein Bild im Theme-Editor
+        wählen. Die Lesbarkeits-Abdunkelung liefert .hero__overlay.
+      {%- endcomment -%}
+      <picture class="hero__picture">
+        <source media="(max-width: 768px)" srcset="{{ 'hero-detail-mobile.svg' | asset_url }}">
+        <img src="{{ 'hero-detail.svg' | asset_url }}"
+          alt="{{ section.settings.image_alt | escape }}"
+          width="2400" height="1600"
+          loading="eager" fetchpriority="high">
+      </picture>
+    {%- endif -%}
   </div>
   <div class="hero__overlay" style="--overlay: {{ section.settings.overlay }};"></div>
 

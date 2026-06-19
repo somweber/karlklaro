@@ -712,11 +712,21 @@ body.menu-open {
 }
 
 @media (min-width: 750px) {
-  .site-footer__grid { grid-template-columns: 1.4fr 1fr 1fr; }
+  .site-footer__grid { grid-template-columns: 1fr 1fr; }
+
+  .site-footer__brand { grid-column: 1 / -1; }
 }
 
 @media (min-width: 990px) {
-  .site-footer__grid { grid-template-columns: 1.6fr 1fr 1fr 1.2fr; }
+  /* Trackliste kommt aus Liquid (--footer-cols) und entspricht IMMER der
+     tatsächlichen Spaltenzahl — keine leeren Grid-Spalten, wenn Menüs
+     nicht belegt sind. Volle Belegung: Marke · Leistungen · Unternehmen ·
+     Kontakt · Folge uns. */
+  .site-footer__grid {
+    grid-template-columns: var(--footer-cols, 1.5fr 1fr 1fr 1.2fr 1.4fr);
+  }
+
+  .site-footer__brand { grid-column: auto; }
 }
 
 .site-footer__blurb {
@@ -788,6 +798,62 @@ body.menu-open {
   color: var(--color-accent);
 }
 
+/* Footer-eigene Social-Reihe sitzt direkt unter der Spalten-Überschrift */
+.site-footer .social-row { margin-top: 0; }
+
+/* Newsletter (form 'customer') */
+.newsletter { margin-top: var(--space-xl); }
+
+.newsletter .site-footer__heading { margin-bottom: var(--space-sm); }
+
+.newsletter__text {
+  margin-bottom: var(--space-sm);
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+}
+
+.newsletter-form__row {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.newsletter-form__row .field__input {
+  min-width: 0;
+  padding: 0.6em 0.9em;
+  font-size: 0.9rem;
+}
+
+.newsletter-form__success {
+  color: var(--color-success);
+  font-size: 0.9rem;
+}
+
+.newsletter-form__error {
+  color: var(--color-error);
+  font-size: 0.9rem;
+  margin-bottom: var(--space-xs);
+}
+
+/* Zahlungsarten: offizielle Badges, ruhig entsättigt, Farbe beim Hover */
+.site-footer__payments {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+  padding-block: var(--space-lg);
+  border-top: 1px solid var(--color-line-soft);
+}
+
+.payment-icon {
+  height: 32px;
+  width: auto;
+  border-radius: 3px;
+  filter: grayscale(1) brightness(1.9) opacity(0.75);
+  transition: filter var(--transition);
+}
+
+.payment-icon:hover { filter: none; }
+
 .site-footer__bottom {
   display: flex;
   flex-wrap: wrap;
@@ -795,7 +861,7 @@ body.menu-open {
   justify-content: space-between;
   align-items: center;
   padding-block: var(--space-lg);
-  border-top: 1px solid var(--color-line);
+  border-top: 1px solid var(--color-line-soft);
   color: var(--color-text-muted);
   font-size: 0.85rem;
 }
@@ -828,6 +894,12 @@ body.menu-open {
   inset: 0;
   border-radius: 0;
   aspect-ratio: auto;
+}
+
+.hero__media picture {
+  position: absolute;
+  inset: 0;
+  display: block;
 }
 
 .hero__media img,
@@ -1996,4 +2068,548 @@ body:has(.sticky-cta) { padding-bottom: 76px; }
   outline: 3px solid var(--color-accent);
   outline-offset: 3px;
   border-radius: 2px;
+}
+
+/* ── 15 Leistungen aus Produkten ────────────────────────────── */
+/* Karten im Produkt-Modus: echtes Produktbild statt Icon-Badge */
+.service-card__media {
+  margin: calc(var(--space-xl) * -1) calc(var(--space-xl) * -1) var(--space-xs);
+}
+
+.service-card__media .media {
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+}
+
+.service-card__facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-xs) var(--space-md);
+}
+
+.service-card__price {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-accent);
+  white-space: nowrap;
+}
+
+.service-card--product .btn {
+  margin-top: var(--space-xs);
+  align-self: start;
+}
+
+.service-item__media {
+  margin: calc(var(--space-xl) * -1) calc(var(--space-xl) * -1) var(--space-xs);
+}
+
+.service-item__media .media {
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+}
+
+/* ── 16 Buchung: Multi-Select & Summary ─────────────────────── */
+.service-select-grid {
+  display: grid;
+  gap: var(--space-sm);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 600px) {
+  .service-select-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* Checkbox-Karte: das echte (unsichtbare) Checkbox-Input liefert
+   Tastatur-Bedienung (Tab + Leertaste) und ARIA gratis. */
+.service-select {
+  position: relative;
+  display: flex;
+  gap: var(--space-md);
+  align-items: flex-start;
+  padding: var(--space-md);
+  background: var(--color-bg);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition),
+    box-shadow var(--transition);
+}
+
+.service-select:hover { border-color: var(--color-accent); }
+
+.service-select__thumb {
+  width: 64px;
+  flex: none;
+  border-radius: var(--radius-sm);
+}
+
+.service-select__body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding-right: 26px; /* Platz für die Check-Blase */
+}
+
+.service-select__title { font-weight: 600; }
+
+.service-select__desc {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.service-select__meta {
+  margin-top: 2px;
+  color: var(--color-accent);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.service-select__check {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--color-line);
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: transparent;
+  transition: background var(--transition), color var(--transition),
+    border-color var(--transition);
+}
+
+/* „ausgewählt“: Klasse setzt JS (Fallback), :has greift sofort */
+.service-select.is-selected,
+.service-select:has(.service-select__input:checked) {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+.service-select.is-selected .service-select__check,
+.service-select:has(.service-select__input:checked) .service-select__check {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+/* Sichtbarer Fokus: Ring um die Karte (modern) + um die Check-Blase (Fallback) */
+.service-select:has(.service-select__input:focus-visible) {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.service-select__input:focus-visible ~ .service-select__check {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.service-select--soldout {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Pakete: eigene Kategorie über den Einzelleistungen */
+.booking-subhead {
+  margin: var(--space-lg) 0 var(--space-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-text-muted);
+}
+
+.booking-subhead:first-of-type { margin-top: 0; }
+
+.service-select--bundle {
+  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-line));
+}
+
+.service-select__badge {
+  display: inline-block;
+  margin-left: 0.4em;
+  padding: 0.1em 0.6em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  vertical-align: middle;
+}
+
+.service-select__includes { font-size: 0.8rem; }
+
+/* „Im Paket enthalten“: gesperrt, aber sichtbar erklärt */
+.service-select.is-locked {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.service-select.is-locked:hover { border-color: var(--color-line); }
+
+.service-select__lock {
+  position: absolute;
+  top: var(--space-sm);
+  right: calc(var(--space-sm) + 30px);
+  padding: 0.15em 0.6em;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* Upsell-Tipp: dezente Zeile unter der gewählten Leistungs-Karte */
+.upsell-tip {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm) var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  background: var(--color-accent-soft);
+  font-size: 0.9rem;
+}
+
+.upsell-tip__text { margin: 0; }
+
+.upsell-tip__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.upsell-tip__close {
+  display: inline-flex;
+  padding: var(--space-2xs);
+  color: var(--color-text-muted);
+}
+
+.upsell-tip__close:hover { color: var(--color-text); }
+
+/* Smart-Upgrade-Banner: <details> → mobil kollabierbare Zeile, nie Overlay */
+.upsell-upgrade {
+  margin-top: var(--space-lg);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-card);
+  background: var(--color-accent-soft);
+}
+
+.upsell-upgrade__summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  list-style: none;
+}
+
+.upsell-upgrade__summary::-webkit-details-marker { display: none; }
+
+.upsell-upgrade__summary .icon {
+  margin-left: auto;
+  flex: none;
+  transition: transform var(--transition);
+}
+
+.upsell-upgrade[open] .upsell-upgrade__summary .icon { transform: rotate(180deg); }
+
+.upsell-upgrade__body {
+  display: grid;
+  gap: var(--space-sm);
+  padding: 0 var(--space-md) var(--space-md);
+}
+
+.upsell-upgrade__body p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+}
+
+.upsell-upgrade__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+/* Summary-Panel: feste Mindesthöhe gegen Layout-Shift.
+   Sticky liegt auf dem Grid-Child .booking-aside — NICHT auf der Karte:
+   .booking-layout hat align-items:start, dadurch ist das aside nur so hoch
+   wie sein Inhalt und ein sticky-Kind hätte keinen Raum zum Haften. */
+.booking-summary {
+  min-height: 200px;
+  align-content: start;
+}
+
+@media (min-width: 990px) {
+  .booking-aside {
+    position: sticky;
+    /* 80px Header + 16px Luft = 96px — kollidiert nicht mit dem Sticky-Header */
+    top: calc(var(--header-height) + var(--space-md));
+  }
+}
+
+.booking-summary__list {
+  display: grid;
+  gap: var(--space-xs);
+  font-size: 0.92rem;
+}
+
+.booking-summary__list li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.booking-summary__list li span:last-child {
+  white-space: nowrap;
+  color: var(--color-text-muted);
+}
+
+.booking-summary__totals {
+  display: grid;
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-line);
+  font-size: 0.95rem;
+}
+
+.booking-summary__row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+/* Mobile Bottom-Bar: kompakte Summe, per Tap aufklappbar */
+.booking-minibar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--z-sticky-cta);
+  display: grid;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--gutter);
+  padding-bottom: calc(var(--space-sm) + env(safe-area-inset-bottom, 0px));
+  background: color-mix(in srgb, var(--color-bg) 92%, transparent);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--color-line);
+  font-size: 0.92rem;
+  transition: opacity var(--transition), transform var(--transition);
+}
+
+/* Fade-out, sobald die echten Formular-Buttons im Viewport sind (doppelte CTAs vermeiden) */
+.booking-minibar.is-out {
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+}
+
+.booking-minibar__bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.booking-minibar__toggle {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: 0;
+  text-align: left;
+  padding: var(--space-2xs) 0;
+}
+
+.booking-minibar__toggle .icon {
+  margin-left: auto;
+  color: var(--color-text-muted);
+  transition: transform var(--transition);
+}
+
+.booking-minibar.is-open .booking-minibar__toggle .icon {
+  transform: rotate(180deg);
+}
+
+.booking-minibar__panel {
+  max-height: 38vh;
+  overflow: auto;
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-line);
+}
+
+.booking-minibar__duration { color: var(--color-text-muted); }
+
+body:has(.booking-minibar) { padding-bottom: 72px; }
+
+@media (min-width: 990px) {
+  .booking-minibar { display: none; }
+  body:has(.booking-minibar) { padding-bottom: 0; }
+}
+
+/* ── 17 Flatpickr: dunkles Marken-Theme ─────────────────────── */
+/* Überschreibt nur Farben/Flächen des CDN-Stylesheets (scoped auf
+   .booking-calendar) — die Flatpickr-Quelle bleibt unangetastet. */
+.booking-calendar .flatpickr-calendar {
+  background: var(--color-bg);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  box-shadow: none;
+  margin-top: var(--space-sm);
+  font-family: var(--font-body);
+}
+
+.booking-calendar .flatpickr-calendar::before,
+.booking-calendar .flatpickr-calendar::after {
+  display: none; /* Popup-Pfeil – beim Inline-Kalender überflüssig */
+}
+
+.booking-calendar .flatpickr-months .flatpickr-month {
+  color: var(--color-text);
+  fill: var(--color-text);
+}
+
+.booking-calendar .flatpickr-current-month .flatpickr-monthDropdown-months,
+.booking-calendar .flatpickr-current-month input.cur-year {
+  color: var(--color-text);
+  background: transparent;
+}
+
+.booking-calendar .flatpickr-current-month .flatpickr-monthDropdown-months .flatpickr-monthDropdown-month {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.booking-calendar .flatpickr-months .flatpickr-prev-month svg,
+.booking-calendar .flatpickr-months .flatpickr-next-month svg {
+  fill: var(--color-text-muted);
+}
+
+.booking-calendar .flatpickr-months .flatpickr-prev-month:hover svg,
+.booking-calendar .flatpickr-months .flatpickr-next-month:hover svg {
+  fill: var(--color-accent);
+}
+
+.booking-calendar span.flatpickr-weekday {
+  color: var(--color-text-muted);
+}
+
+.booking-calendar .flatpickr-day {
+  color: var(--color-text);
+  border-radius: var(--radius-sm);
+}
+
+.booking-calendar .flatpickr-day:hover,
+.booking-calendar .flatpickr-day:focus {
+  background: var(--color-surface-2);
+  border-color: transparent;
+}
+
+.booking-calendar .flatpickr-day.today {
+  border-color: var(--color-accent);
+}
+
+.booking-calendar .flatpickr-day.selected,
+.booking-calendar .flatpickr-day.selected:hover {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+/* Zustand „Kein Termin möglich“ (Werktage, Vergangenheit):
+   deutlich ausgegraut, aber lesbar — Ausgebuchtes ist davon ausgenommen */
+.booking-calendar .flatpickr-day.flatpickr-disabled:not(.day-booked),
+.booking-calendar .flatpickr-day.flatpickr-disabled:not(.day-booked):hover,
+.booking-calendar .flatpickr-day.prevMonthDay:not(.day-booked),
+.booking-calendar .flatpickr-day.nextMonthDay:not(.day-booked) {
+  color: var(--color-text-muted);
+  opacity: 0.35;
+  background: transparent;
+}
+
+/* Zustand „Termin verfügbar“ (freie Wochenenden) */
+.booking-calendar .flatpickr-day.day-available {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.booking-calendar .flatpickr-day.day-available:hover,
+.booking-calendar .flatpickr-day.day-available:focus {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+/* Zustand „Ausgebucht“ (gebuchte Wochenenden): Streifen + durchgestrichen,
+   klar unterscheidbar von „kein Termin möglich“ */
+.booking-calendar .flatpickr-day.day-booked,
+.booking-calendar .flatpickr-day.day-booked:hover {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--color-accent-soft) 0 4px,
+    transparent 4px 8px
+  );
+  border-color: transparent;
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+/* Legende: Swatches spiegeln exakt die Zell-Zustände */
+.cal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-lg);
+  margin-top: var(--space-sm);
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.cal-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.cal-legend__swatch {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  border-radius: 4px;
+}
+
+.cal-legend__swatch--available { border: 1px solid var(--color-accent); }
+
+.cal-legend__swatch--booked {
+  border: 1px solid var(--color-line);
+  background: repeating-linear-gradient(
+    45deg,
+    var(--color-accent-soft) 0 4px,
+    transparent 4px 8px
+  );
+}
+
+.cal-legend__swatch--none {
+  border: 1px solid var(--color-line);
+  background: var(--color-surface);
+  opacity: 0.5;
+}
+
+/* Vom Kalender erzeugtes Anzeige-Feld (altInput) */
+.booking-calendar input.flatpickr-input[readonly] {
+  cursor: default;
 }

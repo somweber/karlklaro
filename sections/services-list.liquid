@@ -8,7 +8,19 @@
 {%- endcomment -%}
 
 {%- liquid
-  # Kategorien einsammeln (für die Anker-Pills oben)
+  # Leistungs-Quelle (Feature „Services als Produkte“): gewählte Kollektion,
+  # sonst automatisch 'detailing-services'. Mit Produkten wird die
+  # Produktliste gerendert, sonst die manuellen Kategorie/Leistung-Blöcke.
+  assign services_collection = section.settings.collection
+  if services_collection == blank
+    assign services_collection = collections['detailing-services']
+  endif
+  assign use_products = false
+  if services_collection != blank and services_collection.products_count > 0
+    assign use_products = true
+  endif
+
+  # Kategorien einsammeln (für die Anker-Pills oben — nur Block-Modus)
   assign cat_list = ''
   for block in section.blocks
     if block.type == 'category'
@@ -22,6 +34,52 @@
 <section class="section"
   style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
   <div class="page-width">
+
+    {%- if use_products -%}
+      <div class="services-group">
+        <div class="services-group__grid">
+          {%- for product in services_collection.products -%}
+            {%- liquid
+              assign duration_minutes = product.metafields.custom.duration_minutes.value
+              assign card_text = product.metafields.custom.short_description.value | default: product.description | strip_html | truncate: 220
+              assign target_url = settings.booking_url | default: '/pages/buchung'
+            -%}
+            <article class="service-item service-item--product" data-reveal>
+              <div class="service-item__media">
+                {% render 'responsive-image',
+                  image: product.featured_image,
+                  alt: product.title,
+                  sizes: '(min-width: 750px) 50vw, 100vw',
+                  aspect: '16 / 9',
+                  placeholder: 'product-apparel-1'
+                %}
+              </div>
+              <div class="service-item__head">
+                <h3>{{ product.title | escape }}</h3>
+                <span class="service-item__price">
+                  {%- if product.price_varies %}{{ 'booking.from_price' | t }} {% endif -%}
+                  {{ product.price | money }}
+                </span>
+              </div>
+              {%- if duration_minutes != blank -%}
+                <span class="service-item__meta">
+                  {%- render 'icon', name: 'clock', size: 16 -%}
+                  {%- render 'duration', minutes: duration_minutes -%}
+                </span>
+              {%- endif -%}
+              {%- if card_text != blank -%}
+                <p class="service-item__text">{{ card_text }}</p>
+              {%- endif -%}
+              <div class="service-item__cta">
+                <a class="btn btn--outline btn--sm" href="{{ target_url }}?services={{ product.handle }}">
+                  {{- section.settings.product_cta_label -}}
+                </a>
+              </div>
+            </article>
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- else -%}
 
     {%- if section.settings.show_anchor_nav and cats.size > 1 -%}
       <nav class="anchor-nav" aria-label="Leistungs-Kategorien">
@@ -103,6 +161,8 @@
       </div></div>
     {%- endif -%}
 
+    {%- endif -%}
+
   </div>
 </section>
 
@@ -111,9 +171,28 @@
   "name": "Leistungsliste",
   "settings": [
     {
+      "type": "header",
+      "content": "Leistungs-Quelle"
+    },
+    {
+      "type": "paragraph",
+      "content": "Mit Kollektion werden Leistungen als Produkte aus dem Admin gezogen. Leer = automatisch „detailing-services“. Ohne Produkte greifen die manuellen Kategorie/Leistung-Blöcke."
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Leistungs-Kollektion"
+    },
+    {
+      "type": "text",
+      "id": "product_cta_label",
+      "label": "Produkt-Button: Text",
+      "default": "Zur Buchung hinzufügen"
+    },
+    {
       "type": "checkbox",
       "id": "show_anchor_nav",
-      "label": "Kategorie-Sprungnavigation anzeigen",
+      "label": "Kategorie-Sprungnavigation anzeigen (Block-Modus)",
       "default": true
     },
     {
