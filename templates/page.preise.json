@@ -10,52 +10,9 @@
     },
     "pricing": {
       "type": "pricing-table",
-      "blocks": {
-        "tier-basic": {
-          "type": "tier",
-          "settings": {
-            "title": "Basic Pflege",
-            "tagline": "Der schnelle Frischekick",
-            "price": "ab € 89",
-            "price_note": "pro Fahrzeug, inkl. USt.",
-            "features": "Außenwäsche per Hand\nInnenraum saugen & wischen\nScheiben innen & außen\nKunststoffpflege innen\nDauer: ca. 2 Stunden",
-            "featured": false,
-            "cta_label": "Basic buchen",
-            "included_services": "handwaesche-exterieur,innenreinigung-komplett"
-          }
-        },
-        "tier-premium": {
-          "type": "tier",
-          "settings": {
-            "title": "Premium Detail",
-            "tagline": "Gründlichkeit + Glanz",
-            "price": "ab € 249",
-            "price_note": "pro Fahrzeug, inkl. USt.",
-            "features": "Alles aus Basic Pflege\nInnenreinigung komplett\nEinstufige Maschinenpolitur\nLack- & Felgenversiegelung\nDauer: ca. 1 Tag",
-            "featured": true,
-            "badge": "Beliebteste Wahl",
-            "cta_label": "Premium buchen",
-            "included_services": "handwaesche-exterieur,innenreinigung-komplett,einstufige-politur"
-          }
-        },
-        "tier-full": {
-          "type": "tier",
-          "settings": {
-            "title": "Full Detail",
-            "tagline": "Das Komplettprogramm",
-            "price": "ab € 489",
-            "price_note": "pro Fahrzeug, inkl. USt.",
-            "features": "Alles aus Premium Detail\nMehrstufige Politur\nKeramikversiegelung Basis\nMotorraum- & Türfalzenreinigung\nDauer: 1–2 Tage",
-            "featured": false,
-            "cta_label": "Full Detail buchen",
-            "included_services": "handwaesche-exterieur,innenreinigung-komplett,mehrstufige-politur,keramik-basis"
-          }
-        }
-      },
-      "block_order": ["tier-basic", "tier-premium", "tier-full"],
       "settings": {
         "eyebrow": "Pakete",
-        "heading": "Drei Pakete. Ein Anspruch.",
+        "heading": "Pakete mit Vorteil.",
         "text": "Wähle das Paket, das zu deinem Fahrzeug passt – oder hol dir ein individuelles Angebot.",
         "custom_label": "Individuelles Angebot anfragen",
         "custom_url": "/pages/kontakt",

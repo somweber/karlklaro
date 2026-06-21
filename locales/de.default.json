@@ -4,7 +4,9 @@
     "menu": "Menü",
     "close": "Menü schließen",
     "previous": "Zurück",
-    "next": "Weiter"
+    "next": "Weiter",
+    "services_empty": "Aktuell sind keine Leistungen verfügbar. Bitte schau später noch einmal vorbei.",
+    "bundles_empty": "Aktuell sind keine Pakete verfügbar. Bitte schau später noch einmal vorbei."
   },
   "cart": {
     "title": "Warenkorb",

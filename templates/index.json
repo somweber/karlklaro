@@ -45,53 +45,10 @@
     },
     "services": {
       "type": "services-overview",
-      "blocks": {
-        "service-1": {
-          "type": "service",
-          "settings": {
-            "icon": "droplet",
-            "title": "Außenreinigung",
-            "text": "Schonende Handwäsche, Felgenpflege und Lackreinigung – gründlicher, als es jede Waschanlage kann.",
-            "url": "/pages/leistungen#aussenreinigung",
-            "link_label": "Mehr erfahren"
-          }
-        },
-        "service-2": {
-          "type": "service",
-          "settings": {
-            "icon": "seat",
-            "title": "Innenreinigung",
-            "text": "Tiefenreinigung für Sitze, Teppiche und alle Oberflächen. Dein Innenraum – frisch wie am ersten Tag.",
-            "url": "/pages/leistungen#innenreinigung",
-            "link_label": "Mehr erfahren"
-          }
-        },
-        "service-3": {
-          "type": "service",
-          "settings": {
-            "icon": "sparkles",
-            "title": "Politur & Lackpflege",
-            "text": "Mehrstufige Politur entfernt Kratzer, Hologramme und Mattigkeit – für ein spiegelglattes Finish.",
-            "url": "/pages/leistungen#politur",
-            "link_label": "Mehr erfahren"
-          }
-        },
-        "service-4": {
-          "type": "service",
-          "settings": {
-            "icon": "shield",
-            "title": "Keramikversiegelung",
-            "text": "Langzeitschutz mit extremem Glanz und Abperleffekt – die Königsklasse der Lackpflege.",
-            "url": "/pages/leistungen#keramik",
-            "link_label": "Mehr erfahren"
-          }
-        }
-      },
-      "block_order": ["service-1", "service-2", "service-3", "service-4"],
       "settings": {
         "eyebrow": "Unsere Leistungen",
         "heading": "Pflege, die man sieht.",
-        "text": "Vom gründlichen Frühjahrsputz bis zur mehrjährigen Keramikversiegelung – jede Behandlung in Handarbeit, mit professionellen Produkten.",
+        "text": "Jede Behandlung in Handarbeit, mit professionellen Produkten – buchbar direkt online.",
         "columns": 4,
         "cta_label": "Alle Leistungen ansehen",
         "cta_url": "/pages/leistungen",

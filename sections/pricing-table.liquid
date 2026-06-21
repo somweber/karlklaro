@@ -1,13 +1,18 @@
 {%- comment -%}
-  sections/pricing-table.liquid — Preis-Pakete als Karten.
+  sections/pricing-table.liquid — Preis-Pakete als Karten (Seite „Preise“).
 
-  Paket-Quelle (Refactor „echte Bundle-Produkte“):
-  1. Kollektion (Picker, sonst automatisch „detailing-bundles“): Pakete sind
-     echte Shopify-Produkte — Preis/Titel/Verfügbarkeit kommen aus dem Admin,
-     enthaltene Leistungen aus dem Metafeld custom.bundle_includes
-     (list.product_reference), Ersparnis-Badge aus custom.savings_label.
-     Der CTA führt zur Buchungsseite und wählt das Paket vor.
-  2. Fallback: manuelle Blöcke (Textpreise „ab € 89“) wie bisher.
+  Einzige Datenquelle: die Paket-Kollektion (Standard „detailing-bundles“).
+  Pakete sind echte Shopify-Produkte; Preis/Titel/Bild kommen aus dem Admin,
+  die enthaltenen Leistungen aus dem Metafeld custom.bundle_includes
+  (list.product_reference → Live-Referenzen auf die Leistungs-Produkte),
+  der Ersparnis-Badge aus custom.savings_label. Keine manuellen Block-
+  Fallbacks mehr. Ohne Pakete erscheint ein Leerzustand.
+
+  Hinweis zur nativen „Shopify Bundles“-App: deren Komponenten sind in Liquid
+  NICHT abrufbar (nur via Storefront API / App-Block) und passen nicht zum
+  server-gerenderten Buchungs-Flow — siehe MIGRATION.md. Falls ein Produkt
+  ohne bundle_includes in der Kollektion liegt, wird es ohne Inhaltsliste
+  dargestellt (kein Bruch).
 {%- endcomment -%}
 
 {%- liquid
@@ -15,10 +20,7 @@
   if bundles_collection == blank
     assign bundles_collection = collections['detailing-bundles']
   endif
-  assign use_bundle_products = false
-  if bundles_collection != blank and bundles_collection.products_count > 0
-    assign use_bundle_products = true
-  endif
+  assign booking_target = settings.booking_url | default: '/pages/buchung'
 -%}
 
 <section class="section section--{{ section.settings.background }}"
@@ -37,7 +39,7 @@
       </header>
     {%- endif -%}
 
-    {%- if use_bundle_products -%}
+    {%- if bundles_collection != blank and bundles_collection.products_count > 0 -%}
       <div class="pricing-grid">
         {%- for product in bundles_collection.products -%}
           {%- liquid
@@ -45,7 +47,6 @@
             assign savings = product.metafields.custom.savings_label.value
             assign duration_minutes = product.metafields.custom.duration_minutes.value
             assign card_text = product.metafields.custom.short_description.value | default: product.description | strip_html | truncate: 160
-            assign booking_target = settings.booking_url | default: '/pages/buchung'
           -%}
           <div class="tier" data-reveal style="--reveal-delay: {{ forloop.index0 | times: 0.08 }}s">
             {%- if savings != blank -%}
@@ -67,75 +68,24 @@
               </small>
             </p>
 
+            {%- comment -%} Enthaltene Leistungen — Live-Referenzen, verschwinden automatisch, wenn ein Leistungs-Produkt gelöscht/deaktiviert wird {%- endcomment -%}
             {%- if includes -%}
               <ul class="tier__features">
                 {%- for inc in includes -%}
-                  <li>{% render 'icon', name: 'check', size: 18 %}<span>{{ inc.title | escape }}</span></li>
+                  {%- if inc != blank -%}
+                    <li>{% render 'icon', name: 'check', size: 18 %}<span>{{ inc.title | escape }}</span></li>
+                  {%- endif -%}
                 {%- endfor -%}
               </ul>
             {%- endif -%}
 
-            {%- assign tier_label = section.settings.product_cta_label -%}
             {%- assign tier_target = booking_target | append: '?services=' | append: product.handle -%}
-            {% render 'button', label: tier_label, url: tier_target, style: 'primary' %}
+            {% render 'button', label: section.settings.product_cta_label, url: tier_target, style: 'primary' %}
           </div>
         {%- endfor -%}
       </div>
     {%- else -%}
-    <div class="pricing-grid">
-      {%- for block in section.blocks -%}
-        <div class="tier{% if block.settings.featured %} tier--featured{% endif %}" data-reveal
-          style="--reveal-delay: {{ forloop.index0 | times: 0.08 }}s" {{ block.shopify_attributes }}>
-
-          {%- if block.settings.featured and block.settings.badge != blank -%}
-            <span class="tier__badge">{{ block.settings.badge | escape }}</span>
-          {%- endif -%}
-
-          <div>
-            <h3>{{ block.settings.title | escape }}</h3>
-            {%- if block.settings.tagline != blank -%}
-              <p class="tier__tagline">{{ block.settings.tagline | escape }}</p>
-            {%- endif -%}
-          </div>
-
-          <p class="tier__price">
-            {{ block.settings.price | escape }}
-            {%- if block.settings.price_note != blank -%}
-              <small>{{ block.settings.price_note | escape }}</small>
-            {%- endif -%}
-          </p>
-
-          {%- if block.settings.features != blank -%}
-            {%- assign features = block.settings.features | newline_to_br | split: '<br />' -%}
-            <ul class="tier__features">
-              {%- for feature in features -%}
-                {%- assign f = feature | strip -%}
-                {%- if f != blank -%}
-                  <li>{% render 'icon', name: 'check', size: 18 %}<span>{{ f }}</span></li>
-                {%- endif -%}
-              {%- endfor -%}
-            </ul>
-          {%- endif -%}
-
-          {%- liquid
-            # Buchungs-Link: optional mit ?services=<handles> — die Buchungsseite
-            # wählt diese Leistungen vor. Pakete sind reine Theme-Konfiguration,
-            # KEINE eigenen Shopify-Produkte (eine Quelle der Wahrheit: die
-            # Kollektion detailing-services).
-            assign tier_cta_url = block.settings.cta_url | default: settings.booking_url | default: '/pages/buchung'
-            if block.settings.included_services != blank
-              assign tier_services = block.settings.included_services | replace: ' ', ''
-              assign tier_cta_url = tier_cta_url | append: '?services=' | append: tier_services
-            endif
-            assign tier_style = 'outline'
-            if block.settings.featured
-              assign tier_style = 'primary'
-            endif
-          -%}
-          {% render 'button', label: block.settings.cta_label, url: tier_cta_url, style: tier_style %}
-        </div>
-      {%- endfor -%}
-    </div>
+      <p class="empty-state">{{ 'general.bundles_empty' | t }}</p>
     {%- endif -%}
 
     {%- if section.settings.custom_label != blank and section.settings.custom_url != blank -%}
@@ -161,7 +111,7 @@
     },
     {
       "type": "paragraph",
-      "content": "Mit Kollektion werden Pakete als echte Produkte gerendert (Preis aus dem Admin, Inhalte aus custom.bundle_includes). Leer = automatisch „detailing-bundles“. Ohne Produkte greifen die manuellen Blöcke."
+      "content": "Pakete werden als Produkte aus der Kollektion gezogen (Preis aus dem Admin, Inhalte aus dem Metafeld custom.bundle_includes). Leer lassen = automatisch „detailing-bundles“. Ohne aktive Pakete erscheint ein Leerzustand."
     },
     {
       "type": "collection",
@@ -188,7 +138,7 @@
       "type": "text",
       "id": "heading",
       "label": "Überschrift",
-      "default": "Drei Pakete. Ein Anspruch."
+      "default": "Pakete mit Vorteil."
     },
     {
       "type": "textarea",
@@ -245,84 +195,10 @@
       "default": 96
     }
   ],
-  "blocks": [
-    {
-      "type": "tier",
-      "name": "Paket",
-      "limit": 4,
-      "settings": [
-        {
-          "type": "text",
-          "id": "title",
-          "label": "Paketname",
-          "default": "Basic Pflege"
-        },
-        {
-          "type": "text",
-          "id": "tagline",
-          "label": "Kurzbeschreibung",
-          "default": "Der schnelle Frischekick"
-        },
-        {
-          "type": "text",
-          "id": "price",
-          "label": "Preis (Text)",
-          "default": "ab € 89"
-        },
-        {
-          "type": "text",
-          "id": "price_note",
-          "label": "Preiszusatz",
-          "default": "pro Fahrzeug, inkl. USt."
-        },
-        {
-          "type": "textarea",
-          "id": "features",
-          "label": "Leistungen (eine pro Zeile)",
-          "default": "Außenwäsche per Hand\nInnenraum saugen & wischen\nScheiben innen & außen\nKunststoffpflege innen"
-        },
-        {
-          "type": "checkbox",
-          "id": "featured",
-          "label": "Hervorheben",
-          "default": false
-        },
-        {
-          "type": "text",
-          "id": "badge",
-          "label": "Badge-Text (bei Hervorhebung)",
-          "default": "Beliebteste Wahl"
-        },
-        {
-          "type": "text",
-          "id": "cta_label",
-          "label": "Button-Text",
-          "default": "Paket anfragen"
-        },
-        {
-          "type": "text",
-          "id": "included_services",
-          "label": "Enthaltene Leistungen (Produkt-Handles)",
-          "info": "Kommagetrennt, z. B. handwaesche-exterieur,innenreinigung-komplett — werden auf der Buchungsseite vorausgewählt."
-        },
-        {
-          "type": "url",
-          "id": "cta_url",
-          "label": "Button-Ziel",
-          "info": "Leer lassen, um die globale Buchungs-URL zu verwenden."
-        }
-      ]
-    }
-  ],
   "presets": [
     {
       "name": "Preis-Pakete",
-      "category": "KlaroClean",
-      "blocks": [
-        { "type": "tier" },
-        { "type": "tier", "settings": { "title": "Premium Detail", "tagline": "Gründlichkeit + Glanz", "price": "ab € 249", "featured": true, "features": "Alles aus Basic Pflege\nInnenreinigung komplett\nEinstufige Maschinenpolitur\nLack- & Felgenversiegelung" } },
-        { "type": "tier", "settings": { "title": "Full Detail", "tagline": "Das Komplettprogramm", "price": "ab € 489", "features": "Alles aus Premium Detail\nMehrstufige Politur\nKeramikversiegelung Basis\nMotorraum- & Türfalzenreinigung" } }
-      ]
+      "category": "KlaroClean"
     }
   ]
 }

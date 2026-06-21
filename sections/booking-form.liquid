@@ -19,7 +19,6 @@
 
 {%- liquid
   assign vehicle_options = section.settings.vehicle_options | newline_to_br | split: '<br />'
-  assign service_options = section.settings.service_options | newline_to_br | split: '<br />'
   assign time_options = section.settings.time_options | newline_to_br | split: '<br />'
   assign aside_steps = section.settings.aside_steps | newline_to_br | split: '<br />'
 
@@ -455,14 +454,10 @@
                       </select>
                     </div>
                     <div class="field">
-                      <label class="field__label" for="BookingService">Gewünschte Leistung <span class="req" aria-hidden="true">*</span></label>
-                      <select class="field__input" id="BookingService" name="contact[Leistung]" required>
-                        <option value="" disabled selected>{{ 'booking.choose' | t }}</option>
-                        {%- for option in service_options -%}
-                          {%- assign opt = option | strip -%}
-                          {%- if opt != blank -%}<option value="{{ opt | escape }}">{{ opt }}</option>{%- endif -%}
-                        {%- endfor -%}
-                      </select>
+                      {%- comment -%} Freitext statt fester Optionen — keine Produktnamen im Code {%- endcomment -%}
+                      <label class="field__label" for="BookingService">Gewünschte Leistung</label>
+                      <input class="field__input" type="text" id="BookingService" name="contact[Leistung]"
+                        autocomplete="off" placeholder="Deine Wunschleistung">
                     </div>
                   </div>
                 </fieldset>
@@ -707,12 +702,6 @@
       "id": "vehicle_options",
       "label": "Fahrzeugtypen (einer pro Zeile)",
       "default": "Kleinwagen\nLimousine\nKombi\nSUV\nVan / Bus\nMotorrad\nSonstiges"
-    },
-    {
-      "type": "textarea",
-      "id": "service_options",
-      "label": "Leistungen (eine pro Zeile, nur Anfrage-Formular)",
-      "default": "Außenreinigung\nInnenreinigung\nPolitur & Lackpflege\nKeramikversiegelung\nScheinwerfer-Aufbereitung\nKomplettpaket\nIndividuelle Anfrage"
     },
     {
       "type": "textarea",
