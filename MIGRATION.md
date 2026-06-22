@@ -5,10 +5,63 @@ Dieses Update stellt den Buchungs-Flow um: **Leistungen sind jetzt Shopify-Produ
 wählen (separate Warenkorb-Positionen mit gemeinsamem Termin) und der Wunschtermin
 wird über einen **Wochenend-Kalender** (Flatpickr) gewählt.
 
-> Ohne die Schritte unten läuft das Theme unverändert weiter: Die Services-Sections
-> zeigen die manuellen Theme-Editor-Blöcke, die Buchungsseite das bisherige
-> Anfrage-Formular (E-Mail). Der neue Flow aktiviert sich automatisch, sobald die
-> Kollektion `detailing-services` Produkte enthält.
+> **Wichtig (Update Datenquelle):** Leistungen und Pakete werden jetzt
+> **ausschließlich** aus den Shopify-Kollektionen gerendert. Es gibt **keine**
+> hartkodierten Fallback-Blöcke mehr. Admin-Änderungen sind die alleinige Quelle
+> der Wahrheit — **keine Theme-Deploys** für Inhaltsänderungen nötig.
+
+---
+
+## 0. Datenquelle: alles dynamisch aus dem Admin
+
+- **Leistungen** = aktive Produkte der Kollektion `detailing-services`.
+- **Pakete** = aktive Produkte der Kollektion `detailing-bundles`.
+- Startseite („Leistungs-Übersicht“), `/leistungen` („Leistungsliste“), `/preise`
+  („Preis-Pakete“) und die Buchungs-Auswahl ziehen alle aus diesen Kollektionen.
+- **Produkt löschen / auf „Entwurf“ stellen → verschwindet sofort** überall beim
+  nächsten Reload. Wieder auf **„Aktiv“** → erscheint wieder. Kein Code-Eingriff.
+- Ist eine Kollektion leer (keine aktiven Produkte), zeigt der Bereich einen
+  **Leerzustand** statt alter Beispieldaten.
+- ⚠️ **Nur Produkte mit Status „Aktiv“** erscheinen im Storefront. **„Entwurf“**
+  und **„Nicht gelistet/Unlisted“** werden von Shopify aus Kollektions-Listen
+  ausgeschlossen und tauchen **nicht** auf. (Beim Aufsetzen dieses Updates standen
+  alle 12 Produkte auf „Unlisted“ — sie wurden auf „Aktiv“ gesetzt, damit sie
+  wieder erscheinen. Genau dieser Zustand war die Ursache des „gelöschte Produkte
+  erscheinen weiter“-Symptoms: leere Kollektion → alte Fallback-Blöcke.)
+
+## 0a. „Shopify Bundles“-App: bewusst NICHT integriert (inkompatibel)
+
+**Entscheidung:** Die native **Shopify-Bundles-App** wird **nicht** verwendet.
+Pakete bleiben **normale Produkte mit dem Metafeld `custom.bundle_includes`**.
+
+**Begründung (recherchiert via Shopify-Doku + Store-Prüfung):**
+
+1. **Komponenten sind in Liquid nicht abrufbar.** Native Bundle-Komponenten gibt
+   es nur über die **Storefront API / Hydrogen** (`ProductVariant.requiresComponents`
+   / `.components`) oder den **App-Block**, den die Bundles-App auf der
+   Produktseite injiziert. In einer server-gerenderten Liquid-Section, die eine
+   Kollektion durchläuft (Startseite, /preise, Buchung), sind sie **nicht**
+   verfügbar — `product.requires_components` existiert als Liquid-Objekt nicht.
+   Unsere Inhalts-Liste, die Sperr-Logik („im Paket enthalten“) und der
+   Upsell-Recommender brauchen die Komponenten aber **direkt in Liquid** — das
+   liefert nur `custom.bundle_includes` (`list.product_reference`).
+2. **Buchungs-Flow mit Termin-Properties.** Der Flow fügt Leistungen per
+   `/cart/add.js` mit **Line-Item-Properties pro Position** hinzu (Wunschtermin,
+   Fahrzeug …). Native Fixed-Bundles fügen nur die **Eltern-Variante** hinzu und
+   splitten serverseitig per Shopify-Function — inkompatibel mit dem
+   ad-hoc-Mehrfach-Add mit eigenen Buchungsdaten.
+3. **Dienstleistungen sind keine physische Ware.** Native Bundles koppeln den
+   Bundle-Bestand an den Komponenten-Bestand (Oversell-Schutz). Unsere Leistungen
+   sind nicht bestandsgeführt — diese Kopplung ist sinnlos und kann die
+   Veröffentlichung blockieren.
+4. **Store-Realität:** Es existieren **keine** nativen Bundles
+   (`hasVariantsThatRequiresComponents: false`); alle Pakete nutzen bereits das
+   Metafeld und funktionieren.
+
+**Robustheit:** Landet doch ein natives Bundle in der Paket-Kollektion, rendert
+das Theme es **ohne** Inhaltsliste als einfache Karte (kein Bruch) — die
+Komponenten sind aus Liquid schlicht nicht lesbar. Die **Shopify-Bundles-App ist
+keine Voraussetzung** für dieses Theme und kann deinstalliert bleiben.
 
 ---
 
@@ -78,8 +131,10 @@ Für jede Leistung ein Produkt (**Produkte → Produkt hinzufügen**):
   *„Dieses Produkt ist ein physisches Produkt“* **entfernen** — sonst fragt der
   Checkout nach einer Versandadresse/Versandart.
 - Lagerbestand: *„Menge nicht verfolgen“* (Leistungen sind nicht limitiert).
-- Status **Aktiv** — nur aktive, verfügbare Produkte sind buchbar; nicht verfügbare
-  erscheinen ausgegraut als „Derzeit nicht verfügbar“.
+- Status **Aktiv** (zwingend) — nur **aktive** Produkte erscheinen überhaupt im
+  Storefront. **„Entwurf“** und **„Nicht gelistet“** werden ausgeschlossen (siehe
+  Abschnitt 0). Im Warenkorb-Modus zeigt ein zwar aktives, aber nicht verfügbares
+  Produkt den Hinweis „Derzeit nicht verfügbar“.
 
 ## 3. Kollektion `detailing-services` anlegen
 
@@ -122,6 +177,23 @@ Shopify-Produkte. Das Theme liest:
 | Enthaltene Leistungen | `custom.bundle_includes` | **Liste von Produkt-Referenzen** (`list.product_reference`) | Produkt | Inhalts-Liste auf /preise + Buchung, Sperr-Logik, Upsell-Empfehlungen |
 | Dauer (Minuten) | `custom.duration_minutes` | Ganzzahl | Produkt | Summe der enthaltenen Leistungen (manuell pflegen) |
 | Ersparnis-Label | `custom.savings_label` | Einzeiliger Text | Produkt | Badge, z. B. „Spare 35 €“ |
+
+**So legst du ein Paket an (ohne Bundles-App):**
+
+1. **Metafeld-Definitionen** anlegen (Einstellungen → Benutzerdefinierte Daten →
+   Produkte): `custom.bundle_includes` als **Produkt-Referenz mit „Liste von
+   Werten akzeptieren“** (`list.product_reference`); optional `custom.savings_label`
+   (Text) und `custom.duration_minutes` (Ganzzahl).
+2. **Paket-Produkt** anlegen wie eine Leistung (nicht-physisch, Bestand nicht
+   verfolgen, Status **Aktiv**), Preis = Paketpreis.
+3. Im Metafeld **„Enthaltene Leistungen“** die Leistungs-Produkte auswählen.
+4. Produkt der Kollektion **`detailing-bundles`** hinzufügen.
+
+**Komponente entfernen / hinzufügen:** Einfach im Metafeld „Enthaltene
+Leistungen“ Referenzen entfernen/ergänzen. Da es **Live-Referenzen** sind,
+ändert sich die angezeigte Inhaltsliste auf /preise und in der Buchung **sofort**
+beim nächsten Reload — kein Deploy. Wird ein referenziertes Leistungs-Produkt
+gelöscht oder deaktiviert, verschwindet es automatisch aus allen Paketen.
 
 **Verhalten:** Auf der Buchungsseite erscheinen Pakete als eigene Kategorie.
 Ein gewähltes Paket sperrt seine enthaltenen Einzelleistungen („Im Paket
