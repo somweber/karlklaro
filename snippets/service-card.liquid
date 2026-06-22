@@ -1,18 +1,13 @@
 {%- comment -%}
-  snippets/service-card.liquid — Leistungs-Karte. Zwei Modi:
+  snippets/service-card.liquid — Leistungs-Karte aus einem Shopify-Produkt.
+  Einzige Datenquelle: das übergebene `product`. Titel, Bild, Preis und
+  Beschreibung kommen live aus dem Admin — nichts ist im Code hinterlegt.
+  Optionale Metafelder: custom.short_description (Kurztext),
+  custom.duration_minutes (Dauer). Der CTA führt zur Buchungsseite und
+  wählt die Leistung dort vor (?services=<handle>, siehe main.js).
 
-  1) Produkt-Modus: `product` wird übergeben — Titel, Bild, Preis und
-     Beschreibung kommen aus dem Shopify-Produkt (Pflege im Admin, kein Code).
-     Optionale Metafelder: custom.short_description (Kurztext),
-     custom.duration_minutes (Dauer). Der CTA führt zur Buchungsseite und
-     wählt die Leistung dort vor (?services=<handle>, siehe main.js).
-
-  2) Manueller Modus (bisheriges Verhalten): icon/title/text/url aus
-     Theme-Editor-Blöcken.
-
-  Parameter Produkt-Modus: product, cta_label, booking_url (optional)
-  Parameter manueller Modus: icon, title, text, url, link_label, attrs
-  Gemeinsam: reveal_delay (Sekunden, gestaffelte Einblendung)
+  Parameter: product (Pflicht), cta_label, booking_url (optional),
+             reveal_delay (Sekunden, gestaffelte Einblendung)
 {%- endcomment -%}
 {%- if product != blank -%}
   {%- liquid
@@ -50,23 +45,6 @@
     </div>
     {%- if cta_label != blank -%}
       <a class="btn btn--outline btn--sm" href="{{ target_url }}?services={{ product.handle }}">{{ cta_label }}</a>
-    {%- endif -%}
-  </article>
-{%- else -%}
-  <article class="service-card" data-reveal
-    {%- if reveal_delay %} style="--reveal-delay: {{ reveal_delay }}s"{% endif %} {{ attrs }}>
-    {%- if icon != blank and icon != 'none' -%}
-      <span class="icon-badge">{% render 'icon', name: icon, size: 26 %}</span>
-    {%- endif -%}
-    <h3>{{ title | escape }}</h3>
-    {%- if text != blank -%}
-      <p class="service-card__text">{{ text }}</p>
-    {%- endif -%}
-    {%- if url != blank -%}
-      <a class="service-card__link" href="{{ url }}">
-        {{ link_label | default: 'Mehr erfahren' }}
-        {%- render 'icon', name: 'arrow-right', size: 18 -%}
-      </a>
     {%- endif -%}
   </article>
 {%- endif -%}

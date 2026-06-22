@@ -1,22 +1,17 @@
 {%- comment -%}
-  sections/services-overview.liquid — Leistungs-Highlights als Karten
-  (Startseite).
+  sections/services-overview.liquid — Leistungs-Highlights als Karten (Startseite).
 
-  Leistungs-Quelle (Feature „Services als Produkte“):
-  1. Im Theme-Editor gewählte Kollektion — sonst automatisch die Kollektion
-     „detailing-services“ (Collection-Picker erlaubt keine Schema-Defaults).
-  2. Hat die Kollektion Produkte, werden diese gerendert (Pflege im Admin).
-  3. Fallback: manuelle Blöcke (bisheriges Verhalten), zuletzt Hinweistext.
+  Einzige Datenquelle: die gewählte Kollektion (Standard „detailing-services“).
+  Es gibt KEINE manuellen Block-Fallbacks mehr — Leistungen werden
+  ausschließlich aus den aktiven Produkten der Kollektion gerendert. Sind
+  keine Produkte vorhanden (Kollektion leer / alle Produkte Entwurf oder
+  gelöscht), erscheint ein Leerzustand. Pflege erfolgt zu 100 % im Admin.
 {%- endcomment -%}
 
 {%- liquid
   assign services_collection = section.settings.collection
   if services_collection == blank
     assign services_collection = collections['detailing-services']
-  endif
-  assign use_products = false
-  if services_collection != blank and services_collection.products_count > 0
-    assign use_products = true
   endif
 -%}
 
@@ -33,7 +28,7 @@
       {%- endif -%}
     </header>
 
-    {%- if use_products -%}
+    {%- if services_collection != blank and services_collection.products_count > 0 -%}
       <div class="grid" style="--cols: {{ section.settings.columns }}; --cols-md: 2;">
         {%- for product in services_collection.products limit: section.settings.products_limit -%}
           {%- assign delay = forloop.index0 | times: 0.08 -%}
@@ -44,23 +39,8 @@
           %}
         {%- endfor -%}
       </div>
-    {%- elsif section.blocks.size > 0 -%}
-      <div class="grid" style="--cols: {{ section.settings.columns }}; --cols-md: 2;">
-        {%- for block in section.blocks -%}
-          {%- assign delay = forloop.index0 | times: 0.08 -%}
-          {% render 'service-card',
-            icon: block.settings.icon,
-            title: block.settings.title,
-            text: block.settings.text,
-            url: block.settings.url,
-            link_label: block.settings.link_label,
-            attrs: block.shopify_attributes,
-            reveal_delay: delay
-          %}
-        {%- endfor -%}
-      </div>
     {%- else -%}
-      <p class="lead">{{ 'booking.collection_empty' | t }}</p>
+      <p class="empty-state">{{ 'general.services_empty' | t }}</p>
     {%- endif -%}
 
     {%- if section.settings.cta_label != blank and section.settings.cta_url != blank -%}
@@ -81,7 +61,7 @@
     },
     {
       "type": "paragraph",
-      "content": "Mit Kollektion werden Leistungen als Produkte aus dem Admin gezogen (Titel, Preis, Bild, Beschreibung). Leer = automatisch „detailing-services“. Ohne Produkte greifen die manuellen Blöcke."
+      "content": "Leistungen werden aus den Produkten der Kollektion gezogen (Titel, Preis, Bild, Beschreibung aus dem Admin). Leer lassen = automatisch „detailing-services“. Ohne aktive Produkte erscheint ein Leerzustand."
     },
     {
       "type": "collection",
@@ -123,7 +103,7 @@
       "type": "textarea",
       "id": "text",
       "label": "Einleitung",
-      "default": "Vom gründlichen Frühjahrsputz bis zur mehrjährigen Keramikversiegelung – jede Behandlung in Handarbeit, mit professionellen Produkten."
+      "default": "Jede Behandlung in Handarbeit, mit professionellen Produkten – buchbar direkt online."
     },
     {
       "type": "range",
@@ -177,65 +157,10 @@
       "default": 96
     }
   ],
-  "blocks": [
-    {
-      "type": "service",
-      "name": "Leistung",
-      "limit": 8,
-      "settings": [
-        {
-          "type": "select",
-          "id": "icon",
-          "label": "Icon",
-          "options": [
-            { "value": "none", "label": "Kein Icon" },
-            { "value": "droplet", "label": "Wassertropfen" },
-            { "value": "seat", "label": "Sitz / Innenraum" },
-            { "value": "sparkles", "label": "Glanz" },
-            { "value": "shield", "label": "Schutzschild" },
-            { "value": "beam", "label": "Scheinwerfer" },
-            { "value": "car", "label": "Auto" },
-            { "value": "gem", "label": "Edelstein" },
-            { "value": "heart", "label": "Herz" }
-          ],
-          "default": "sparkles"
-        },
-        {
-          "type": "text",
-          "id": "title",
-          "label": "Titel",
-          "default": "Außenreinigung"
-        },
-        {
-          "type": "textarea",
-          "id": "text",
-          "label": "Beschreibung",
-          "default": "Schonende Handwäsche, Felgenpflege und Lackreinigung – gründlicher, als es jede Waschanlage kann."
-        },
-        {
-          "type": "url",
-          "id": "url",
-          "label": "Link-Ziel"
-        },
-        {
-          "type": "text",
-          "id": "link_label",
-          "label": "Link-Text",
-          "default": "Mehr erfahren"
-        }
-      ]
-    }
-  ],
   "presets": [
     {
       "name": "Leistungs-Übersicht",
-      "category": "KlaroClean",
-      "blocks": [
-        { "type": "service" },
-        { "type": "service", "settings": { "icon": "seat", "title": "Innenreinigung", "text": "Tiefenreinigung für Sitze, Teppiche und alle Oberflächen. Dein Innenraum – frisch wie am ersten Tag." } },
-        { "type": "service", "settings": { "icon": "sparkles", "title": "Politur & Lackpflege", "text": "Mehrstufige Politur entfernt Kratzer, Hologramme und Mattigkeit – für ein spiegelglattes Finish." } },
-        { "type": "service", "settings": { "icon": "shield", "title": "Keramikversiegelung", "text": "Langzeitschutz mit extremem Glanz und Abperleffekt – die Königsklasse der Lackpflege." } }
-      ]
+      "category": "KlaroClean"
     }
   ]
 }
